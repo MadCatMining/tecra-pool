@@ -39,7 +39,6 @@ function BackendUpdateServices()
 		// 27=>'Sia',
 		28=>'blake2s',
 		29=>'skunk',
-		30=>'mtp',
 	);
 
 	$res = fetch_url('https://api.nicehash.com/api?method=stats.global.current');

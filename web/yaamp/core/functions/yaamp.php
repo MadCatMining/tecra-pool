@@ -6,6 +6,7 @@ function yaamp_get_algos()
 	return array(
 		'sha256',
 		'sha256t',
+		'sha256q',
 		'scrypt',
 		'scryptn',
 		'allium',
@@ -17,6 +18,7 @@ function yaamp_get_algos()
 		'blake',
 		'blakecoin',
 		'blake2s',
+		'blake2b',
 		'decred',
 		'deep',
 		'exosis',
@@ -31,8 +33,10 @@ function yaamp_get_algos()
 		'luffa',
 		'lyra2',
 		'lyra2v2',
+		'lyra2v3',
 		'lyra2z',
-		'mtp',
+		'lyra2z330',
+		'lyra2zz',
 		'neoscrypt',
 		'nist5',
 		'penta',
@@ -84,9 +88,11 @@ function yaamp_algo_mBTC_factor($algo)
 	switch($algo) {
 	case 'sha256':
 	case 'sha256t':
+	case 'sha256q':
 	case 'blake':
 	case 'blakecoin':
 	case 'blake2s':
+	case 'blake2b':
 	case 'decred':
 	case 'keccak':
 	case 'keccakc':
@@ -116,7 +122,6 @@ function yaamp_get_algo_norm($algo)
 		'lyra2'		=> 1.0,
 		'lyra2v2'	=> 1.0,
 		'myr-gr'	=> 1.0,
-		'mtp'           => 1.0,
 		'nist5'		=> 1.0,
 		'neoscrypt'	=> 1.0,
 		'quark'		=> 1.0,
@@ -143,8 +148,8 @@ function getAlgoColors($algo)
 {
 	$a = array(
 		'sha256'	=> '#d0d0a0',
-		'mtp'        	=> '#d0d0a0',
 		'sha256t'	=> '#d0d0f0',
+		'sha256q'	=> '#9696dd',
 		'scrypt'	=> '#c0c0e0',
 		'neoscrypt'	=> '#a0d0f0',
 		'scryptn'	=> '#d0d0d0',
@@ -169,6 +174,7 @@ function getAlgoColors($algo)
 		'bastion'	=> '#e0b0b0',
 		'blake'		=> '#f0f0f0',
 		'blakecoin'	=> '#f0f0f0',
+		'blake2b'	=> '#f2c81f',
 		'exosis'	=> '#49CCFE',
 		'groestl'	=> '#d0a0a0',
 		'jha'		=> '#a0d0c0',
@@ -188,10 +194,13 @@ function getAlgoColors($algo)
 		'qubit'		=> '#d0a0f0',
 		'rainforest'	=> '#d0f0a0',
 		'lbk3'		=> '#809aef',
-		'lyra2'		=> '#80a0f0',
+		'lyra2'		=> '#80bcf0',
 		'lyra2v2'	=> '#80c0f0',
+		'lyra2v3'       => '#8040f0',
 		'lyra2z'	=> '#80b0f0',
-		'phi'		=> '#a0a0e0',
+		'lyra2z330' => '#80bee2',
+		'lyra2zz'	=> '#80a0f0',
+		'phi'		=> '#a0bb00',
 		'phi2'		=> '#a0a0e0',
 		'polytimos'	=> '#dedefe',
 		'sib'		=> '#a0a0c0',
@@ -226,6 +235,7 @@ function getAlgoPort($algo)
 	$a = array(
 		'sha256'	=> 3333,
 		'sha256t'	=> 3339,
+		'sha256q'	=> 3337,
 		'lbry'		=> 3334,
 		'scrypt'	=> 3433,
 		'timetravel'	=> 3555,
@@ -255,9 +265,12 @@ function getAlgoPort($algo)
 		'scryptn'	=> 4333,
 		'allium'	=> 4443,
 		'lbk3'		=> 5522,
-		'lyra2'		=> 4433,
+		'lyra2'		=> 4432,
 		'lyra2v2'	=> 4533,
+		'lyra2v3'	=> 4433,
 		'lyra2z'	=> 4553,
+		'lyra2z330'	=> 4554,
+		'lyra2zz'	=> 4555,
 		'jha'		=> 4633,
 		'qubit'		=> 4733,
 		'zr5'		=> 4833,
@@ -277,6 +290,7 @@ function getAlgoPort($algo)
 		'decred'	=> 3252,
 		'vanilla'	=> 5755,
 		'blake2s'	=> 5766,
+		'blake2b'	=> 5777,
 		'penta'		=> 5833,
 		'rainforest'	=> 7443,
 		'luffa'		=> 5933,
@@ -295,7 +309,6 @@ function getAlgoPort($algo)
 		'skunk'		=> 8433,
 		'tribus'	=> 8533,
 	        'a5a'   	=> 8633,
-		'mtp'           => 4556,
 	);
 
 	global $configCustomPorts;
@@ -357,7 +370,7 @@ function yaamp_hashrate_constant($algo=null)
 
 function yaamp_hashrate_step()
 {
-	return 600; //300  600 best so far;
+	return 300;
 }
 
 function yaamp_profitability($coin)
@@ -424,7 +437,7 @@ function yaamp_pool_rate($algo=null)
 	$target = yaamp_hashrate_constant($algo);
 	$interval = yaamp_hashrate_step();
 	$delay = time()-$interval;
-	
+
 	$rate = controller()->memcache->get_database_scalar("yaamp_pool_rate-$algo",
 		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND algo=:algo", array(':algo'=>$algo));
 
@@ -465,19 +478,11 @@ function yaamp_user_rate($userid, $algo=null)
 
 	$target = yaamp_hashrate_constant($algo);
 	$interval = yaamp_hashrate_step();
-	$ti1 = time();
-	$delay = $ti1-$interval;
+	$delay = time()-$interval;
 
-	$delta1 = controller()->memcache->get_database_scalar("yaamp_pool_rate-$userid-$algo",
-	"SELECT (UNIX_TIMESTAMP()-time) FROM shares WHERE valid AND time>(UNIX_TIMESTAMP()-$interval)  AND userid=$userid AND algo=:algo ORDER BY time ASC LIMIT 1", array(':algo'=>$algo));
-
-	if (!$delta1)
-		$delta1 = $interval;
-	
 	$rate = controller()->memcache->get_database_scalar("yaamp_user_rate-$userid-$algo",
-		"SELECT (sum(difficulty) * $target / $delta1  / 1000) FROM shares WHERE valid AND time>$delay AND userid=$userid AND algo=:algo", array(':algo'=>$algo));
+		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND userid=$userid AND algo=:algo", array(':algo'=>$algo));
 
-//	$rate = ($rate_1/$delta1)+($rate_1/$delta2);		
 	return $rate;
 }
 
@@ -506,13 +511,8 @@ function yaamp_worker_rate($workerid, $algo=null)
 	$interval = yaamp_hashrate_step();
 	$delay = time()-$interval;
 
-	$delta = controller()->memcache->get_database_scalar("yaamp_pool_rate-$workerid-$algo",
-	"SELECT (UNIX_TIMESTAMP()-time) FROM shares WHERE valid AND time>(UNIX_TIMESTAMP()-$interval)  AND workerid=$workerid AND algo=:algo ORDER BY time ASC LIMIT 1", array(':algo'=>$algo));
-
-	if (!$delta) $delta = $interval;
-
 	$rate = controller()->memcache->get_database_scalar("yaamp_worker_rate-$workerid-$algo",
-		"SELECT (sum(difficulty) * $target / $delta / 1000) FROM shares WHERE valid AND time>$delay AND workerid=".$workerid);
+		"SELECT (sum(difficulty) * $target / $interval / 1000) FROM shares WHERE valid AND time>$delay AND workerid=".$workerid);
 
 	return $rate;
 }

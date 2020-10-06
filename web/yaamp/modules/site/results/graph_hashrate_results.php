@@ -34,8 +34,6 @@ if ($averages[0][1] == 0) $averages[0][1] = $averages[1][1];
 
 $avg2 = array();
 $average = $averages[0][1];
-
-$count = 1;
 foreach($averages as $n) {
 	$average = ($average*(100-$percent) + $n[1]*$percent) / 100;
 	$m = round($average, 3);

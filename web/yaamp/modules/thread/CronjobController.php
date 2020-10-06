@@ -125,7 +125,7 @@ class CronjobController extends CommonController
 
 			case 1:
 				if(!YAAMP_PRODUCTION) break;
-/*
+
 				getBitstampBalances();
 				getCexIoBalances();
 				doBittrexTrading();
@@ -134,21 +134,18 @@ class CronjobController extends CommonController
 				doKrakenTrading();
 				doLiveCoinTrading();
 				doPoloniexTrading();
-*/				
 				break;
 
 			case 2:
 				if(!YAAMP_PRODUCTION) break;
-/*
+
 				doBinanceTrading();
 				doCCexTrading();
-				doBterTrading();
 				doBleutradeTrading();
 				doKuCoinTrading();
 				doNovaTrading();
 				doYobitTrading();
 				doCoinsMarketsTrading();
-*/				
 				break;
 
 			case 3:
@@ -202,27 +199,19 @@ class CronjobController extends CommonController
 		$mining->save();
 
 		memcache_set($this->memcache->memcache, 'apache_locked', true);
-        debuglog("testpayments: nginx ".YAAMP_USE_NGINX?'1':'0');
 		if(YAAMP_USE_NGINX)
 			system("service nginx stop");
 
-        debuglog("testpayments: before sleep");
 		sleep(10);
-        debuglog("testpayments: before do backup");
 		BackendDoBackup();
-        debuglog("testpayments: after do backup");
 		memcache_set($this->memcache->memcache, 'apache_locked', false);
 
 		// prevent user balances changes during payments (blocks thread)
 		memcache_set($this->memcache->memcache, 'balances_locked', true, 0, 300);
-        debuglog("testpayments: before do payments");
 		BackendPayments();
-        debuglog("testpayments: after do payments");
 		memcache_set($this->memcache->memcache, 'balances_locked', false);
 
-        debuglog("testpayments: before clean db");
 		BackendCleanDatabase();
-        debuglog("testpayments: after clean db");
 
 	//	BackendOptimizeTables();
 		debuglog('payments sequence done');

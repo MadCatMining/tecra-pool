@@ -166,10 +166,10 @@ $('#algo_select').change(function(event)
 
 </td></tr></table>
 
-<!--br><br><br><br><br><br><br><br><br><br>
 <br><br><br><br><br><br><br><br><br><br>
 <br><br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br><br-->
+<br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
 
 <script type="text/javascript">
 
@@ -247,19 +247,13 @@ function graph_init_1(data)
 		seriesColors: [ "rgba(78, 180, 180, 0.8)" ],
 		series: [ { fill: true } ],
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 2,
+			shadowDepth: 2
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 function graph_init_2(data)
@@ -289,19 +283,13 @@ function graph_init_2(data)
 			rendererOptions: {barWidth: 3}
 		},
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 2,
+			shadowDepth: 2
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 function graph_init_3(data)
@@ -331,19 +319,13 @@ function graph_init_3(data)
 			rendererOptions: { barWidth: 3 }
 		},
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 2,
+			shadowDepth: 2
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -378,19 +360,13 @@ function graph_init_4(data)
 		seriesColors: [ "rgba(78, 180, 180, 0.8)" ],
 		series: [ { fill: true } ],
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 2,
+			shadowDepth: 2
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 function graph_init_5(data)
@@ -420,19 +396,13 @@ function graph_init_5(data)
 			rendererOptions: { barWidth: 3 }
 		},
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 2,
+			shadowDepth: 2
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 function graph_init_6(data)
@@ -462,19 +432,13 @@ function graph_init_6(data)
 			rendererOptions: { barWidth: 3 }
 		},
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 2,
+			shadowDepth: 2
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -509,19 +473,13 @@ function graph_init_7(data)
 		seriesColors: [ "rgba(78, 180, 180, 0.8)" ],
 		series: [ { fill: true } ],
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 2,
+			shadowDepth: 2
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 function graph_init_8(data)
@@ -551,19 +509,13 @@ function graph_init_8(data)
 			rendererOptions: { smooth: true }
 		},
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 2,
+			shadowDepth: 2
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 function graph_init_9(data)
@@ -593,19 +545,13 @@ function graph_init_9(data)
 			rendererOptions: { smooth: true }
 		},
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 2,
+			shadowDepth: 2
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 

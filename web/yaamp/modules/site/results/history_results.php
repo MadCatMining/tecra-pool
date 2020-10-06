@@ -130,7 +130,7 @@ foreach($others as $item)
 }
 
 ///////////////////////////////////////////////////////////////////////
-/*
+
 $hashrate1 = controller()->memcache->get_database_scalar("history_hashrate1-$algo",
 	"SELECT AVG(hashrate) FROM hashrate WHERE time>$t1 AND algo=:algo", array(':algo'=>$algo));
 
@@ -199,14 +199,14 @@ echo '<td align="right" style="font-size: .9em;">'.$btcmhday3.'</td>';
 echo '<td align="right" style="font-size: .9em;">'.$btcmhday4.'</td>';
 
 echo '</tr>';
-*/
+
 echo '</table>';
 
 
 echo '</div>';
 
-//echo '<br>';
-echo '</div></div>';
+echo '<br>';
+echo '</div></div><br>';
 
 
 

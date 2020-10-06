@@ -78,7 +78,7 @@ void object_prune_debug(CommonList *list, YAAMP_OBJECT_DELETE_FUNC deletefunc)
 		if(!object) continue;
 
 		if(object->deleted && object->lock_count)
-			debuglog("object set for delete is locked");
+			debuglog("object set for delete is locked\n");
 
 		if(object->deleted && !object->lock_count)
 		{
@@ -92,7 +92,7 @@ void object_prune_debug(CommonList *list, YAAMP_OBJECT_DELETE_FUNC deletefunc)
 	}
 
 	if (list->count)
-		debuglog("still %d objects in list", list->count);
+		debuglog("still %d objects in list\n", list->count);
 
 	list->Leave();
 }

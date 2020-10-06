@@ -18,7 +18,6 @@ try
 catch(CException $e)
 {
 	debuglog($e, 5);
-	throw $e;
 
 // 	$message = $e->getMessage();
 // 	send_email_alert('backend', "backend error", "$message");

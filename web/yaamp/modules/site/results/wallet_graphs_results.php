@@ -5,8 +5,7 @@ if(!$user) return;
 
 echo <<<end
 <div class="main-left-box">
-<!--div class="main-left-title">Last 24 Hours Hashrate: $user->username</div-->
-<div class="main-left-title">Last 24 Hours Hashrate</div>
+<div class="main-left-title">Last 24 Hours Hashrate: $user->username</div>
 <div class="main-left-inner"><br>
 end;
 
@@ -21,12 +20,7 @@ foreach(yaamp_get_algos() as $algo)
 
 	echo <<<end
 <input type=hidden id=$algo class='graph_algo'>
-<div id='graph_results_$algo' style='height: 240px;'></div>
-<div style='float: right;'>
-<span style='font-size: .8em; color: #4bb2c5;'>Average</span>
-<span style='font-size: .8em; color: #eaa228;'>Instantaneous</span>
-</div>
-</br>
+<div id='graph_results_$algo' style='height: 240px;'></div><br>
 end;
 }
 

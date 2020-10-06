@@ -16,7 +16,7 @@ void db_query(YAAMP_DB *db, const char *format, ...);
 
 void db_register_stratum(YAAMP_DB *db);
 void db_update_algos(YAAMP_DB *db);
-bool db_update_coinds(YAAMP_DB *db);
+void db_update_coinds(YAAMP_DB *db);
 void db_update_remotes(YAAMP_DB *db);
 
 //int db_find_user(YAAMP_DB *db, YAAMP_CLIENT *client);
@@ -24,7 +24,6 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client);
 
 void db_add_worker(YAAMP_DB *db, YAAMP_CLIENT *client);
 void db_clear_worker(YAAMP_DB *db, YAAMP_CLIENT *client);
-void db_clear_workerdb(YAAMP_DB *db);
 void db_update_worker(YAAMP_DB *db, YAAMP_CLIENT *client);
 void db_update_workers(YAAMP_DB *db);
 

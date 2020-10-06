@@ -119,7 +119,7 @@ static int decred_parse_header(YAAMP_JOB_TEMPLATE *templ, const char *header_hex
 		uint32_t hashtag[3];
 	} header;
 
-	//debuglog("HEADER: %s", header_hex);
+	//debuglog("HEADER: %s\n", header_hex);
 
 	binlify((unsigned char*) &header, header_hex);
 
@@ -154,15 +154,15 @@ retry:
 		if (--retry_cnt > 0) {
 			if (coind->rpc.curl)
 				rpc_curl_get_lasterr(rpc_error, 1023);
-			debuglog("%s getwork retry %d", coind->symbol, GETWORK_RETRY_MAX-retry_cnt);
+			debuglog("%s getwork retry %d\n", coind->symbol, GETWORK_RETRY_MAX-retry_cnt);
 			goto retry;
 		}
-		debuglog("%s error getwork %s", coind->symbol, rpc_error);
+		debuglog("%s error getwork %s\n", coind->symbol, rpc_error);
 		return NULL;
 	}
 	json_value *gwr = json_get_object(gw, "result");
 	if(!gwr) {
-		debuglog("%s no getwork json result!", coind->symbol);
+		debuglog("%s no getwork json result!\n", coind->symbol);
 		return NULL;
 	}
 	else if (json_is_null(gwr)) {
@@ -174,14 +174,14 @@ retry:
 			if (--retry_cnt > 0) {
 				goto retry;
 			}
-			debuglog("%s getwork failed after %d tries: %s",
+			debuglog("%s getwork failed after %d tries: %s\n",
 				coind->symbol, GETWORK_RETRY_MAX, err);
 		}
 		return NULL;
 	}
 	const char *header_hex = json_get_string(gwr, "data");
 	if (!header_hex || !strlen(header_hex)) {
-		debuglog("%s no getwork data!", coind->symbol);
+		debuglog("%s no getwork data!\n", coind->symbol);
 		return NULL;
 	}
 
@@ -230,7 +230,6 @@ static void decred_fix_template(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, j
 
 YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 {
-	debuglog("coind_create_template");
 	if(coind->usememorypool)
 		return coind_create_template_memorypool(coind);
 
@@ -239,18 +238,11 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 	else if(g_stratum_segwit) strcpy(params, "[{\"rules\":[\"segwit\"]}]");
 
 	json_value *json = rpc_call(&coind->rpc, "getblocktemplate", params);
-
-	if(!json || json_is_null(json)) {
-		debuglog("try to call the wallet a second time if first fails");
-		sleep(10); // try a second time
-        json = rpc_call(&coind->rpc, "getblocktemplate", params);
-	}
-
 	if(!json || json_is_null(json))
 	{
 		// coind_error() reset auto_ready, and DCR gbt can fail
 		if (strcmp(coind->rpcencoding, "DCR") == 0)
-			debuglog("decred getblocktemplate failed");
+			debuglog("decred getblocktemplate failed\n");
 		else
 			coind_error(coind, "getblocktemplate");
 		return NULL;
@@ -278,7 +270,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 				}
 				coind->usesegwit |= g_stratum_segwit;
 				if (coind->usesegwit)
-					debuglog("%s segwit enabled, magic %s", coind->symbol, coind->witness_magic);
+					debuglog("%s segwit enabled, magic %s\n", coind->symbol, coind->witness_magic);
 				break;
 			}
 		}
@@ -320,7 +312,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 	const char *claim = json_get_string(json_result, "claimtrie");
 	if (claim) {
 		strcpy(templ->claim_hex, claim);
-		// debuglog("claimtrie: %s", templ->claim_hex);
+		// debuglog("claimtrie: %s\n", templ->claim_hex);
 	}
 	else if (strcmp(coind->symbol, "LBC") == 0) {
 		json_value *json_claim = rpc_call(&coind->rpc, "getclaimtrie");
@@ -337,7 +329,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 		claim = json_get_string(json_obj, "hash");
 		if (claim) {
 			strcpy(templ->claim_hex, claim);
-			debuglog("claim_hex: %s", templ->claim_hex);
+			debuglog("claim_hex: %s\n", templ->claim_hex);
 		}
 	}
 
@@ -367,12 +359,12 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 		unsigned int nVersion = (unsigned int)json_get_int(json_result, "version");
 		if (nVersion & 0xFFFF0000UL == 0) {
 			nVersion |= (0x16UL << 16);
-			debuglog("%s version %s >> %08x", coind->symbol, templ->version, nVersion);
+			debuglog("%s version %s >> %08x\n", coind->symbol, templ->version, nVersion);
 		}
 		sprintf(templ->version, "%08x", nVersion);
 	}
 
-//	debuglog("%s ntime %s", coind->symbol, templ->ntime);
+//	debuglog("%s ntime %s\n", coind->symbol, templ->ntime);
 //	uint64_t target = decode_compact(json_get_string(json_result, "bits"));
 //	coind->difficulty = target_to_diff(target);
 
@@ -382,9 +374,9 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 //	char target[1024];
 //	strcpy(target, json_get_string(json_result, "target"));
 //	uint64_t coin_target = decode_compact(templ->nbits);
-//	debuglog("nbits %s", templ->nbits);
-//	debuglog("target %s", target);
-//	debuglog("0000%016llx", coin_target);
+//	debuglog("nbits %s\n", templ->nbits);
+//	debuglog("target %s\n", target);
+//	debuglog("0000%016llx\n", coin_target);
 
 	if(coind->isaux)
 	{
@@ -435,7 +427,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 
 		// if wanted, we can limit the count of txs to include
 		if (g_limit_txs_per_block && i >= g_limit_txs_per_block-2) {
-			debuglog("limiting block to %d first txs (of %d)", g_limit_txs_per_block, json_tx->u.array.length);
+			debuglog("limiting block to %d first txs (of %d)\n", g_limit_txs_per_block, json_tx->u.array.length);
 			templ->has_filtered_txs = true;
 		}
 	}
@@ -494,7 +486,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 	if(templ->txmerkles[0])
 		templ->txmerkles[strlen(templ->txmerkles)-1] = 0;
 
-	debuglog("merkle transactions %d [%s]", templ->txcount, templ->txmerkles);
+//	debuglog("merkle transactions %d [%s]\n", templ->txcount, templ->txmerkles);
 	ser_string_be2(templ->prevhash_hex, templ->prevhash_be, 8);
 
 	if(!strcmp(coind->symbol, "LBC"))
@@ -513,7 +505,7 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 
 bool coind_create_job(YAAMP_COIND *coind, bool force)
 {
-	debuglog("create job %s", coind->symbol);
+//	debuglog("create job %s\n", coind->symbol);
 
 	bool b = rpc_connected(&coind->rpc);
 	if(!b) return false;
@@ -532,7 +524,7 @@ bool coind_create_job(YAAMP_COIND *coind, bool force)
 	if(!templ)
 	{
 		CommonUnlock(&coind->mutex);
-//		debuglog("%s: create job template failed!", coind->symbol);
+//		debuglog("%s: create job template failed!\n", coind->symbol);
 		return false;
 	}
 
@@ -543,7 +535,7 @@ bool coind_create_job(YAAMP_COIND *coind, bool force)
 		templ->txcount == job_last->templ->txcount &&
 		strcmp(templ->coinb2, job_last->templ->coinb2) == 0)
 	{
-//		debuglog("coind_create_job %s %d same template %x ", coind->name, coind->height, coind->job->id);
+//		debuglog("coind_create_job %s %d same template %x \n", coind->name, coind->height, coind->job->id);
 		if (templ->txcount) {
 			templ->txsteps.clear();
 			templ->txdata.clear();
@@ -592,7 +584,6 @@ bool coind_create_job(YAAMP_COIND *coind, bool force)
 	coind->job->templ = templ;
 
 	coind->job->profit = coind_profitability(coind);
-
 	coind->job->maxspeed = coind_nethash(coind) *
 		(g_current_algo->profit? min(1.0, coind_profitability(coind)/g_current_algo->profit): 1);
 
@@ -602,7 +593,7 @@ bool coind_create_job(YAAMP_COIND *coind, bool force)
 	g_list_job.AddTail(coind->job);
 	CommonUnlock(&coind->mutex);
 
-//	debuglog("coind_create_job %s %d new job %x", coind->name, coind->height, coind->job->id);
+//	debuglog("coind_create_job %s %d new job %x\n", coind->name, coind->height, coind->job->id);
 
 	return true;
 }

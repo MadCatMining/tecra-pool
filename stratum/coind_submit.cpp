@@ -7,21 +7,21 @@ bool coind_submitwork(YAAMP_COIND *coind, const char *block)
 
 	char *params = (char *)malloc(paramlen+1024);
 	if(!params) {
-		debuglog("%s: OOM!", __func__);
+		debuglog("%s: OOM!\n", __func__);
 		return false;
 	}
 
 	sprintf(params, "[\"%s\"]", block);
 	json_value *json = rpc_call(&coind->rpc, "getwork", params);
 	if(!json) {
-		debuglog("%s: retry", __func__);
+		debuglog("%s: retry\n", __func__);
 		usleep(500*YAAMP_MS);
 		json = rpc_call(&coind->rpc, "getwork", params);
 	}
 	free(params);
 
 	if(!json) {
-		debuglog("%s: error, no answer", __func__);
+		debuglog("%s: error, no answer\n", __func__);
 		return false;
 	}
 
@@ -42,19 +42,16 @@ bool coind_submitblock(YAAMP_COIND *coind, const char *block)
 
 	sprintf(params, "[\"%s\"]", block);
 	json_value *json = rpc_call(&coind->rpc, "submitblock", params);
-	free(params);
 
-	if(!json) {
-		printf("****************JSON FALSE**************");
-		return false;
-	}
+	free(params);
+	if(!json) return false;
 
 	json_value *json_error = json_get_object(json, "error");
 	if(json_error && json_error->type != json_null)
 	{
 		const char *p = json_get_string(json_error, "message");
 		if(p) stratumlog("ERROR %s %s\n", coind->name, p);
-		printf("ERROR %s %s\n", coind->name, p);
+
 	//	job_reset();
 		json_value_free(json);
 
@@ -143,6 +140,9 @@ bool coind_submitgetauxblock(YAAMP_COIND *coind, const char *hash, const char *b
 
 	json_value *json_result = json_get_object(json, "result");
 	bool b = json_result && json_result->type == json_boolean && json_result->u.boolean;
+	// some auxpow coins return error:null, result: null on success
+	if(!b)
+		b=json_result && json_result->type == json_null;
 
 	json_value_free(json);
 	return b;

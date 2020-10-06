@@ -22,11 +22,11 @@ echo <<<END
 <th data-sorter="numeric" align="right">Coins</th>
 <th data-sorter="numeric" align="right">Miners</th>
 <th data-sorter="numeric" align="right">Hashrate</th>
-<th data-sorter="currency" align="right">Fees</th>
+<th data-sorter="currency" align="right">Fees**</th>
 <th data-sorter="currency" class="estimate" align="right">Current<br>Estimate</th>
 <!--<th data-sorter="currency" >Norm</th>-->
 <th data-sorter="currency" class="estimate" align="right">24 Hours<br>Estimated</th>
-<th data-sorter="currency"align="right">24 Hours</th>
+<th data-sorter="currency"align="right">24 Hours<br>Actual***</th>
 </tr>
 </thead>
 END;
@@ -116,7 +116,7 @@ foreach($algos as $item)
 	$port = getAlgoPort($algo);
 
 	if($defaultalgo == $algo)
-		echo "<tr style='cursor: pointer; /*background-color: #e0d3e8;*/' onclick='javascript:select_algo(\"$algo\")'>";
+		echo "<tr style='cursor: pointer; background-color: #e0d3e8;' onclick='javascript:select_algo(\"$algo\")'>";
 	else
 		echo "<tr style='cursor: pointer' class='ssrow' onclick='javascript:select_algo(\"$algo\")'>";
 
@@ -151,10 +151,9 @@ foreach($algos as $item)
 
 echo "</tbody>";
 
-/*
 if($defaultalgo == 'all')
 	echo "<tr style='cursor: pointer; background-color: #e0d3e8;' onclick='javascript:select_algo(\"all\")'>";
-else 
+else
 	echo "<tr style='cursor: pointer' class='ssrow' onclick='javascript:select_algo(\"all\")'>";
 
 echo "<td><b>all</b></td>";
@@ -165,16 +164,14 @@ echo "<td></td>";
 echo "<td></td>";
 echo '<td class="estimate"></td>';
 echo '<td class="estimate"></td>';
-
 echo "<td></td>";
-*/
 echo "</tr>";
 
 echo "</table>";
 
-//echo '<p style="font-size: .8em;">&nbsp;* values in mBTC/MH/day, per GH for sha & blake algos</p>';
+echo '<p style="font-size: .8em;">&nbsp;* values in mBTC/MH/day, per GH for sha & blake algos</p>';
 
-echo "</div></div>";
+echo "</div></div><br>";
 ?>
 
 <?php if (!$showestimates): ?>

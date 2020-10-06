@@ -118,14 +118,10 @@ function graph_price_data(data)
 			markerOptions: { style: 'circle', size: 0.25 }
 		},
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 0, shadowDepth: 0,
+			background: '#f0f0f0'
 		},
 
 		legend: {
@@ -148,8 +144,6 @@ function graph_price_data(data)
 			show: true
 		}
 	});
-	$(window).resize(function() {
-		price_graph.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 	// limit visible axis ticks
 	var x2ticks = price_graph.axes.x2axis._ticks;
 	price_graph.axes.xaxis.ticks = [];
@@ -211,14 +205,10 @@ function graph_balance_data(data)
 			fill: true
 		},
 
-		grid:
-		{
-			borderWidth: 0.5,
-			shadowWidth: 0,
-			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+		grid: {
+			borderWidth: 1,
+			shadowWidth: 0, shadowDepth: 0,
+			background: '#f0f0f0'
 		},
 
 		legend: {
@@ -241,8 +231,6 @@ function graph_balance_data(data)
 			show: true
 		}
 	});
-	$(window).resize(function() {
-		balance_graph.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 	// limit visible axis ticks
 	var x2ticks = balance_graph.axes.x2axis._ticks;
 	balance_graph.axes.xaxis.ticks = [];

@@ -73,12 +73,12 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client)
 			}
 		}
 		if (!guest) {
-			debuglog("Invalid user address '%s'", client->username);
+			debuglog("Invalid user address '%s'\n", client->username);
 			return;
 		}
 	}
 
-	// debuglog("user %s %s gives %d %", client->username, symbol, gift);
+	// debuglog("user %s %s gives %d %\n", client->username, symbol, gift);
 	db_query(db, "SELECT id, is_locked, logtraffic, coinid, donation FROM accounts WHERE username='%s'", client->username);
 
 	MYSQL_RES *result = mysql_store_result(&db->mysql);
@@ -119,7 +119,7 @@ void db_add_user(YAAMP_DB *db, YAAMP_CLIENT *client)
 			" AND (SELECT pending FROM balanceuser WHERE userid=%d ORDER by time DESC LIMIT 1) = 0" // pending balance
 			, symbol, (uint) time(NULL), gift, client->sock->ip, client->userid, client->userid, client->userid);
 		if (mysql_affected_rows(&db->mysql) > 0 && strlen(symbol)) {
-			debuglog("%s: %s coinsymbol set to %s ip %s uid (%d)",
+			debuglog("%s: %s coinsymbol set to %s ip %s uid (%d)\n",
 				g_current_algo->name, client->username, symbol, client->sock->ip, client->userid);
 		}
 	}
@@ -134,12 +134,6 @@ void db_clear_worker(YAAMP_DB *db, YAAMP_CLIENT *client)
 
 	db_query(db, "DELETE FROM workers WHERE id=%d", client->workerid);
 	client->workerid = 0;
-}
-
-void db_clear_workerdb(YAAMP_DB *db)
-{
-	// clear worker database on stratum restart to avoid glitch on crash
-	db_query(db, "DELETE FROM workers");
 }
 
 void db_add_worker(YAAMP_DB *db, YAAMP_CLIENT *client)
@@ -194,7 +188,7 @@ void db_update_workers(YAAMP_DB *db)
 			continue;
 		}
 
-// why ?		client->speed *= 0.8;
+		client->speed *= 0.8;
 		if(client->difficulty_written == client->difficulty_actual) continue;
 
 		db_query(db, "UPDATE workers SET difficulty=%f, subscribe=%d WHERE id=%d",

@@ -21,9 +21,9 @@ try
 catch(CException $e)
 {
 	debuglog($e, 5);
-    throw $e;
-//	$message = $e->getMessage();
-//	echo "exception: $message\n";
+
+	$message = $e->getMessage();
+	echo "exception: $message\n";
 // 	send_email_alert('backend', "backend error", "$message");
 }
 

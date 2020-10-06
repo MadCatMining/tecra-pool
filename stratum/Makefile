@@ -14,19 +14,17 @@ LDFLAGS=-O2 `mysql_config --libs`
 LDLIBS=iniparser/libiniparser.a algos/libalgos.a sha3/libhash.a -lpthread -lgmp -lm -lstdc++
 LDLIBS+=-lmysqlclient
 
-SOURCES=stratum.cpp db.cpp coind.cpp coind_aux.cpp coind_template.cpp coind_submit.cpp util.cpp logging.cpp list.cpp \
+SOURCES=stratum.cpp db.cpp coind.cpp coind_aux.cpp coind_template.cpp coind_submit.cpp util.cpp list.cpp \
 	rpc.cpp job.cpp job_send.cpp job_core.cpp merkle.cpp share.cpp socket.cpp coinbase.cpp \
 	client.cpp client_submit.cpp client_core.cpp client_difficulty.cpp remote.cpp remote_template.cpp \
-	user.cpp object.cpp  base58.cpp
-
-SOURCES_c=json.c jsonp_error.c json-builder.c bos_serializer.c bos_deserializer.c
+	user.cpp object.cpp json.cpp base58.cpp
 
 CFLAGS += -DHAVE_CURL
 SOURCES += rpc_curl.cpp
 LDCURL = $(shell /usr/bin/pkg-config --static --libs libcurl)
 LDFLAGS += $(LDCURL)
 
-OBJECTS=$(SOURCES:.cpp=.o) $(SOURCES_c:.c=.o)
+OBJECTS=$(SOURCES:.cpp=.o)
 OUTPUT=stratum
 
 CODEDIR1=algos
@@ -64,8 +62,6 @@ clean:
 	rm -f sha3/*.o
 	rm -f sha3/*.a
 	rm -f algos/ar2/*.o
-	rm -rf algos/merkletree/*.o
-	rm -rf algos/argon2ref/*.o
 
 install: clean all
 	strip -s stratum

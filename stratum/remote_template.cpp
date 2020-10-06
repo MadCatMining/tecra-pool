@@ -5,7 +5,7 @@ void remote_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VALUES *submi
 {
 	YAAMP_REMOTE *remote = job->remote;
 	if(!remote) {
-		debuglog("job has no remote!");
+		debuglog("job has no remote!\n");
 		return;
 	}
 	if(remote->deleted) return;
@@ -15,8 +15,8 @@ void remote_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VALUES *submi
 	uint64_t hash_int = get_hash_difficulty(submitvalues->hash_bin);
 	uint64_t remote_target = diff_to_target(remote->difficulty_actual);
 
-//	debuglog("%016llx actual", hash_int);
-//	debuglog("%016llx target diff multiplier=%u", remote_target, g_current_algo->diff_multiplier);
+//	debuglog("%016llx actual\n", hash_int);
+//	debuglog("%016llx target diff multiplier=%u\n", remote_target, g_current_algo->diff_multiplier);
 
 	if(hash_int > remote_target) return;
 	remote->speed_avg += remote->difficulty_actual / g_current_algo->diff_multiplier * 42;
@@ -38,8 +38,8 @@ void remote_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VALUES *submi
 //
 //		if(remote->renter->balance-increment <= 0.00001000)
 //		{
-//			debuglog("balance %.8f %.8f", remote->renter->balance, increment);
-//			debuglog("no more fund, stop remote %d", remote->id);
+//			debuglog("balance %.8f %.8f\n", remote->renter->balance, increment);
+//			debuglog("no more fund, stop remote %d\n", remote->id);
 //
 //			remote->renter->balance = 0;
 //			remote->reset_balance = true;
@@ -118,7 +118,7 @@ void remote_create_job(YAAMP_REMOTE *remote, json_value *json_params)
 //	{
 //		YAAMP_COIND *coind = (YAAMP_COIND *)li->data;
 //		if(coind->deleted) continue;
-////		debuglog("coin height %d %d", coind->height, templ->height);
+////		debuglog("coin height %d %d\n", coind->height, templ->height);
 //		if(coind->height - 1 < templ->height && coind->height + 3 > templ->height)
 //		{
 //			found = true;

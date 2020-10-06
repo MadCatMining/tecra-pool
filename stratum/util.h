@@ -1,4 +1,3 @@
-#include "logging.h"
 
 struct YAAMP_CLIENT;
 
@@ -61,7 +60,7 @@ const char *header_value(const char *data, const char *search, char *value);
 void initlog(const char *algo);
 void closelogs();
 
-void __debuglog(const char* filename, int fileline, const char *format, ...);
+void debuglog(const char *format, ...);
 void stratumlog(const char *format, ...);
 void stratumlogdate(const char *format, ...);
 void clientlog(YAAMP_CLIENT *client, const char *format, ...);
@@ -71,7 +70,7 @@ void rejectlog(const char *format, ...);
 
 vector<string> merkle_steps(vector<string> input);
 string merkle_with_first(vector<string> steps, string f);
-string merkle_with_first_mtp(vector<string> steps, string f);
+
 //////////////////////////////////////////////////////////////////////////
 
 bool base58_decode(const char *input, char *output);
@@ -81,6 +80,7 @@ void base64_encode(char *base64, const char *normal);
 void base64_decode(char *normal, const char *base64);
 
 void ser_number(int n, char *s);
+void ser_compactsize(uint64_t nSize, char *a);
 
 void ser_string_be(const char *input, char *output, int len);
 void ser_string_be2(const char *input, char *output, int len);
@@ -103,8 +103,6 @@ double target_to_diff(uint64_t target);
 
 uint64_t get_hash_difficulty(unsigned char *input);
 
-void diff_to_target(uint32_t *target, double diff);
-
 long long current_timestamp();
 long long current_timestamp_dms();
 
@@ -117,7 +115,7 @@ void string_upper(char *s);
 int getblocheight(const char *coinb1);
 
 //////////////////////////////////////////////////////////////////////////
-/*
+
 #ifndef max
 #define max(a,b)            (((a) > (b)) ? (a) : (b))
 #endif
@@ -125,7 +123,7 @@ int getblocheight(const char *coinb1);
 #ifndef min
 #define min(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
-*/
+
 //////////////////////////////////////////////////////////////////////////
 
 #if !HAVE_DECL_LE16DEC
@@ -140,3 +138,5 @@ static inline uint32_t bswap32(uint32_t x) {
 	__asm__ __volatile__ ("bswapl %0" : "=r" (x) : "0" (x));
 	return x;
 }
+
+uint64_t share_to_target(double diff);

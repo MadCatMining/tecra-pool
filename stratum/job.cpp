@@ -2,7 +2,7 @@
 #include "stratum.h"
 
 //client->difficulty_remote = 0;
-//debuglog(" returning %x, %s, %s", job->id, client->sock->ip, #condition); \
+//debuglog(" returning %x, %s, %s\n", job->id, client->sock->ip, #condition); \
 
 #define RETURN_ON_CONDITION(condition, ret) \
 	if(condition) \
@@ -19,7 +19,7 @@ static bool job_assign_client(YAAMP_JOB *job, YAAMP_CLIENT *client, double maxha
 	RETURN_ON_CONDITION(maxhash > 0 && job->speed + client->speed > maxhash, true);
 
 	if(!g_autoexchange && maxhash >= 0. && client->coinid != job->coind->id) {
-		//debuglog("prevent client %c on %s, not the right coin",
+		//debuglog("prevent client %c on %s, not the right coin\n",
 		//	client->username[0], job->coind->symbol);
 		return true;
 	}
@@ -105,10 +105,10 @@ static bool job_assign_client(YAAMP_JOB *job, YAAMP_CLIENT *client, double maxha
 	job->speed += client->speed;
 	job->count++;
 
-//	debuglog(" assign %x, %f, %d, %s", job->id, client->speed, client->reconnecting, client->sock->ip);
+//	debuglog(" assign %x, %f, %d, %s\n", job->id, client->speed, client->reconnecting, client->sock->ip);
 	if(strcmp(client->extranonce1, client->extranonce1_last) || client->extranonce2size != client->extranonce2size_last)
 	{
-//		debuglog("new nonce %x %s %s", job->id, client->extranonce1_last, client->extranonce1);
+//		debuglog("new nonce %x %s %s\n", job->id, client->extranonce1_last, client->extranonce1);
 		if(!client->extranonce_subscribe)
 		{
 			strcpy(client->extranonce1_reconnect, client->extranonce1);
@@ -142,7 +142,7 @@ void job_assign_clients(YAAMP_JOB *job, double maxhash)
 {
 	if (!job) return;
 
-	job->speed = (double)0.0;
+	job->speed = 0;
 	job->count = 0;
 
 	g_list_client.Enter();
@@ -213,7 +213,7 @@ void job_assign_clients_left(double factor)
 					factor = 0.;
 			}
 
-			//debuglog("%s %s factor %f nethash %.3f", coind->symbol, client->username, factor, nethash);
+			//debuglog("%s %s factor %f nethash %.3f\n", coind->symbol, client->username, factor, nethash);
 
 			if (factor > 0.) {
 				b = job_assign_client(coind->job, client, nethash*factor);
@@ -237,13 +237,11 @@ void *job_thread(void *p)
 	{
 		job_update();
 		pthread_cond_wait(&g_job_cond, &g_job_mutex);
-      debuglog("********************************after pthread_cond_wait *************************");
 	}
 }
 
 void job_init()
 {
-   debuglog("********************************job_init *************************");
 	pthread_mutex_init(&g_job_mutex, 0);
 	pthread_cond_init(&g_job_cond, 0);
 
@@ -253,7 +251,6 @@ void job_init()
 
 void job_signal()
 {
-       debuglog("********************************job_signal *************************");
 	CommonLock(&g_job_mutex);
 	pthread_cond_signal(&g_job_cond);
 	CommonUnlock(&g_job_mutex);
@@ -261,8 +258,7 @@ void job_signal()
 
 void job_update()
 {
-	debuglog("job_update()");
-	debuglog("********************************job_update *************************");
+//	debuglog("job_update()\n");
 	job_reset_clients();
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -304,7 +300,7 @@ void job_update()
 		if(client->deleted) continue;
 		if(client->jobid_next) continue;
 
-		debuglog("clients with no job");
+		debuglog("clients with no job\n");
 		g_current_algo->overflow = true;
 
 		if(!g_list_coind.first) break;
@@ -328,20 +324,19 @@ void job_update()
 //	usleep(100*YAAMP_MS);
 
 //	int ready = 0;
-//	debuglog("job_update");
+//	debuglog("job_update\n");
 
 	g_list_job.Enter();
 	for(CLI li = g_list_job.first; li; li = li->next)
 	{
 		YAAMP_JOB *job = (YAAMP_JOB *)li->data;
-
 		if(!job_can_mine(job)) continue;
 
 		job_broadcast(job);
 //		ready++;
 	}
 
-//	debuglog("job_update %d / %d jobs", ready, g_list_job.count);
+//	debuglog("job_update %d / %d jobs\n", ready, g_list_job.count);
 	g_list_job.Leave();
 
 }

@@ -106,17 +106,13 @@ function graph_init_assets(data)
 
 		grid:
 		{
-			borderWidth: 0.5,
+			borderWidth: 1,
 			shadowWidth: 0,
 			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+			background: '#ffffff'
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -162,17 +158,13 @@ function graph_init_negative(data)
 
 		grid:
 		{
-			borderWidth: 0.5,
+			borderWidth: 1,
 			shadowWidth: 0,
 			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+			background: '#ffffff'
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 ///////////////////////////////////////////////////////////////////////

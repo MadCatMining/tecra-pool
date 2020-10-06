@@ -1,5 +1,5 @@
 
-#define YAAMP_SOCKET_BUFSIZE	(128*1024) //max 10x POW
+#define YAAMP_SOCKET_BUFSIZE	(2*1024)
 
 struct YAAMP_SOCKET
 {
@@ -10,9 +10,8 @@ struct YAAMP_SOCKET
 	int sock;
 
 	int buflen;
-	int buflen_bos;
 	char buffer[YAAMP_SOCKET_BUFSIZE];
-	
+
 	int last_read;
 	int total_read;
 };
@@ -25,19 +24,9 @@ YAAMP_SOCKET *socket_initialize(int sock);
 void socket_close(YAAMP_SOCKET *s);
 
 json_value *socket_nextjson(YAAMP_SOCKET *s, YAAMP_CLIENT *client=NULL);
-void socket_nextjson2(json_value * json, YAAMP_SOCKET *s, YAAMP_CLIENT *client=NULL);
 int socket_send(YAAMP_SOCKET *s, const char *format, ...);
-
-json_value *socket_nextjson_bos(YAAMP_SOCKET *s, YAAMP_CLIENT *client = NULL);
-void socket_nextjson_bos2(json_value * json, YAAMP_SOCKET *s, YAAMP_CLIENT *client = NULL);
-char *socket_nextjson_bos3(YAAMP_SOCKET *s, YAAMP_CLIENT *client = NULL);
-int socket_send(YAAMP_SOCKET *s, const char *format, ...);
-
-int socket_send_mtp(YAAMP_SOCKET *s, const char *format, ...);
-int socket_send_mtp2(YAAMP_CLIENT *client, const char *format, ...);
 
 int socket_send_raw(YAAMP_SOCKET *s, const char *buffer, int size);
-int socket_send_raw_mtp(YAAMP_SOCKET *s, json_value * obj);
 
 static union {
 	struct {

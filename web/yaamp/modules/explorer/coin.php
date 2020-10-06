@@ -194,12 +194,10 @@ function diff_graph_data(data)
 
 		grid:
 		{
-			borderWidth: 0.5,
+			borderWidth: 1,
 			shadowWidth: 0,
 			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+			background: '#ffffff'
 		},
 
 		highlighter:
@@ -208,8 +206,6 @@ function diff_graph_data(data)
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 </script>
 end;

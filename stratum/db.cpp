@@ -5,7 +5,6 @@
 
 void db_reconnect(YAAMP_DB *db)
 {
-	debuglog("coming to db_reconnect ");
 	if (g_exiting) {
 		db_close(db);
 		return;
@@ -14,25 +13,15 @@ void db_reconnect(YAAMP_DB *db)
 	mysql_init(&db->mysql);
 	for(int i=0; i<6; i++)
 	{
-//		MYSQL *p = mysql_real_connect(&db->mysql, g_sql_host, g_sql_username, g_sql_password, g_sql_database, g_sql_port, 0, 0);
-//		if(p) break;
-		if(mysql_real_connect(&db->mysql, g_sql_host, g_sql_username, g_sql_password, g_sql_database, g_sql_port, 0, 0))
-										break;
-		debuglog("mysql error: %d, %s \n", i, mysql_error(&db->mysql));
-		sleep(5);
+		MYSQL *p = mysql_real_connect(&db->mysql, g_sql_host, g_sql_username, g_sql_password, g_sql_database, g_sql_port, 0, 0);
+		if(p) break;
+
+		stratumlog("%d, %s\n", i, mysql_error(&db->mysql));
+		sleep(10);
 
 		mysql_close(&db->mysql);
 		mysql_init(&db->mysql);
 	}
-/*
-	if (!mysql_real_connect(&db->mysql, g_sql_host, g_sql_username, g_sql_password, g_sql_database, g_sql_port, 0, 0))
-	{
-		stratumlog("%d, %s\n", 0, mysql_error(&db->mysql));
-		mysql_close(&db->mysql);
-	}
-*/
-
-
 }
 
 YAAMP_DB *db_connect()
@@ -131,7 +120,7 @@ void db_update_algos(YAAMP_DB *db)
 
 	if(g_current_algo->overflow)
 	{
-		debuglog("setting overflow");
+		debuglog("setting overflow\n");
 		g_current_algo->overflow = false;
 
 		db_query(db, "UPDATE algos SET overflow=true WHERE name='%s'", g_stratum_algo);
@@ -185,19 +174,17 @@ void db_update_algos(YAAMP_DB *db)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool db_update_coinds(YAAMP_DB *db)
+void db_update_coinds(YAAMP_DB *db)
 {
-	if(!db) {
-		debuglog("can't find database");
-		return false;
-	}
+	if(!db) return;
+
 	for(CLI li = g_list_coind.first; li; li = li->next)
 	{
 		YAAMP_COIND *coind = (YAAMP_COIND *)li->data;
 		if(coind->deleted) continue;
 		if(coind->auto_ready) continue;
 
-		debuglog("disabling %s", coind->symbol);
+		debuglog("disabling %s\n", coind->symbol);
 		db_query(db, "update coins set auto_ready=%d where id=%d", coind->auto_ready, coind->id);
 	}
 
@@ -215,13 +202,13 @@ bool db_update_coinds(YAAMP_DB *db)
 	MYSQL_ROW row;
 	g_list_coind.Enter();
 
-	int count = 0;
 	while((row = mysql_fetch_row(result)) != NULL)
 	{
-		count++;
 		YAAMP_COIND *coind = (YAAMP_COIND *)object_find(&g_list_coind, atoi(row[0]));
 		if(!coind)
 		{
+      if (!strlen(g_stratum_coin_include) || (strlen(g_stratum_coin_include) && strstr(g_stratum_coin_include, row[20])))
+		 {
 			coind = new YAAMP_COIND;
 			memset(coind, 0, sizeof(YAAMP_COIND));
 
@@ -229,7 +216,8 @@ bool db_update_coinds(YAAMP_DB *db)
 			coind->newblock = true;
 			coind->id = atoi(row[0]);
 			coind->aux.coind = coind;
-		}
+      }		 else			continue;
+	      	}
 		else
 			coind->newcoind = false;
 
@@ -337,6 +325,7 @@ bool db_update_coinds(YAAMP_DB *db)
 			if (strcmp(coind->symbol, "FLAX") == 0) coind->oldmasternodes = true;
 			if (strcmp(coind->symbol, "ITZ") == 0) coind->oldmasternodes = true;
 			if (strcmp(coind->symbol, "J") == 0 || strcmp(coind->symbol2, "J") == 0) coind->oldmasternodes = true;
+			if (strcmp(coind->symbol, "LAX") == 0) coind->oldmasternodes = true;
 			if (strcmp(coind->symbol, "MAG") == 0) coind->oldmasternodes = true;
 			if (strcmp(coind->symbol, "PBS") == 0) coind->oldmasternodes = true;
 			if (strcmp(coind->symbol, "URALS") == 0) coind->oldmasternodes = true;
@@ -349,11 +338,11 @@ bool db_update_coinds(YAAMP_DB *db)
 		//coind->touch = true;
 		if(coind->newcoind)
 		{
-			debuglog("connecting to coind %s", coind->symbol);
+			debuglog("connecting to coind %s\n", coind->symbol);
 
 			bool b = rpc_connect(&coind->rpc);
 			if (!b) {
-				debuglog("%s: connect failure", coind->symbol);
+				debuglog("%s: connect failure\n", coind->symbol);
 				object_delete(coind);
 				continue;
 			}
@@ -363,13 +352,9 @@ bool db_update_coinds(YAAMP_DB *db)
 			usleep(100*YAAMP_MS);
 		}
 		coind->touch = true;
-		debuglog("db_update_coinds: request block update ");
 		coind_create_job(coind);
 	}
-	if (count==0) {
-		debuglog("problem with database: can't access coin data ");
-		return false;
-	}	
+
 	mysql_free_result(result);
 
 	for(CLI li = g_list_coind.first; li; li = li->next)
@@ -388,7 +373,6 @@ bool db_update_coinds(YAAMP_DB *db)
 
 	coind_sort();
 	g_list_coind.Leave();
-	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -444,7 +428,7 @@ void db_update_remotes(YAAMP_DB *db)
 		{
 			if(remote->renter && remote->renter->balance <= 0.00001000)
 			{
-				debuglog("dont load that job %d", remote->id);
+				debuglog("dont load that job %d\n", remote->id);
 				delete remote;
 				continue;
 			}
@@ -461,9 +445,9 @@ void db_update_remotes(YAAMP_DB *db)
 		if(remote->renter)
 		{
 			if(!strcmp(g_current_algo->name, "sha256"))
-				remote->speed = min(remote->speed, max(remote->renter->balance/g_current_algo->rent*100000000, (double)1));
+				remote->speed = min(remote->speed, max(remote->renter->balance/g_current_algo->rent*100000000, 1));
 			else
-				remote->speed = min(remote->speed, max(remote->renter->balance/g_current_algo->rent*100000, (double)1));
+				remote->speed = min(remote->speed, max(remote->renter->balance/g_current_algo->rent*100000, 1));
 		}
 	}
 
@@ -486,7 +470,7 @@ void db_update_remotes(YAAMP_DB *db)
 
 		if(remote->kill)
 		{
-			debuglog("******* kill that sucka %s", remote->host);
+			debuglog("******* kill that sucka %s\n", remote->host);
 
 			pthread_cancel(remote->thread);
 			object_delete(remote);
@@ -496,7 +480,7 @@ void db_update_remotes(YAAMP_DB *db)
 
 		if(remote->sock && remote->sock->last_read && remote->sock->last_read+120<time(NULL))
 		{
-			debuglog("****** timeout %s", remote->host);
+			debuglog("****** timeout %s\n", remote->host);
 
 			remote->status = YAAMP_REMOTE_TERMINATE;
 			remote->kill = true;

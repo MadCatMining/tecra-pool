@@ -58,27 +58,6 @@ string merkle_with_first(vector<string> steps, string f)
 	return f;
 }
 
-
-string merkle_with_first_mtp(vector<string> steps, string f) 
-{
-	vector<string>::const_iterator i;
-    for(i = steps.begin(); i != steps.end(); ++i)
-	{
-		string s = f + *i;
-		char bin[YAAMP_HASHLEN_BIN*2];
-		char out[YAAMP_HASHLEN_STR];
-		binlify((unsigned char *)bin, s.c_str());
-	
-		for (int k=0;k<16;k++)
-			printf(" %08x ",((uint32_t*)bin)[k]);
-
-		printf(" \n");
-		sha256_double_hash_hex_le(bin, out, YAAMP_HASHLEN_BIN*2);
-		f = out;
-	}
-	return f;
-}
-
 //def withFirst(self, f):
 //        steps = self._steps
 //        for s in steps:

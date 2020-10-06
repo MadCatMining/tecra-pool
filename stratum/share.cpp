@@ -5,7 +5,7 @@
 //{
 //	if(job->coind && job->remote)
 //	{
-//		debuglog("error memory");
+//		debuglog("error memory\n");
 //	}
 //}
 
@@ -66,11 +66,7 @@ static void share_add_worker(YAAMP_CLIENT *client, YAAMP_JOB *job, bool valid, c
 	if(valid)
 	{
 		worker->difficulty += client->difficulty_actual / g_current_algo->diff_multiplier;
-//		client->speed += client->difficulty_actual / g_current_algo->diff_multiplier * 42;
-//		client->speed += client->difficulty_actual;
-		client->sum_difficulty += client->difficulty_actual;
-		uint32_t deltatime = (uint32_t)(current_timestamp() - client->start_time);
-		client->speed = pow(2,29)*client->sum_difficulty/(double)deltatime; 
+		client->speed += client->difficulty_actual / g_current_algo->diff_multiplier * 42;
 	//	client->source->speed += client->difficulty_actual / g_current_algo->diff_multiplier * 42;
 	}
 
@@ -144,7 +140,7 @@ void share_write(YAAMP_DB *db)
 
 		// todo: link max_ttf ?
 		if((now - worker->ntime) > 15*60 || worker->ntime > now) {
-			debuglog("ntime warning: value %d (%08x) offset %d secs from uid %d", worker->ntime, worker->ntime, (now - worker->ntime), worker->userid);
+			debuglog("ntime warning: value %d (%08x) offset %d secs from uid %d\n", worker->ntime, worker->ntime, (now - worker->ntime), worker->userid);
 		}
 
 		if(++count >= 1000)
@@ -255,12 +251,12 @@ bool block_confirm(int coinid, const char *blockhash)
 			sprintf(params, "[\"%s\"]", blockhash);
 			json_value *json = rpc_call(&coind->rpc, "getblock", params);
 			if(!json) {
-				debuglog("%s: error getblock, no answer", __func__);
+				debuglog("%s: error getblock, no answer\n", __func__);
 				break;
 			}
 			json_value *json_res = json_get_object(json, "result");
 			if(!json_res) {
-				debuglog("%s: error getblock, no result", __func__);
+				debuglog("%s: error getblock, no result\n", __func__);
 				break;
 			}
 			const char *h1 = json_get_string(json_res, "pow_hash"); // DGB, MYR, J
@@ -269,7 +265,7 @@ bool block_confirm(int coinid, const char *blockhash)
 			if (h1) snprintf(hash, 161, "%s", h1);
 			else if (h2) snprintf(hash, 161, "%s", h2);
 			else if (h3) snprintf(hash, 161, "%s", h3);
-			//debuglog("%s: getblock %s -> pow %s", __func__, blockhash, hash);
+			//debuglog("%s: getblock %s -> pow %s\n", __func__, blockhash, hash);
 			json_value_free(json);
 			break;
 		} else if (strcmp(coind->symbol,"ORB") == 0) {
@@ -277,12 +273,12 @@ bool block_confirm(int coinid, const char *blockhash)
 			sprintf(params, "[\"%s\"]", blockhash);
 			json_value *json = rpc_call(&coind->rpc, "getblock", params);
 			if(!json) {
-				debuglog("%s: error getblock, no answer", __func__);
+				debuglog("%s: error getblock, no answer\n", __func__);
 				break;
 			}
 			json_value *json_res = json_get_object(json, "result");
 			if(!json_res) {
-				debuglog("%s: error getblock, no result", __func__);
+				debuglog("%s: error getblock, no result\n", __func__);
 				break;
 			}
 			const char *h = json_get_string(json_res, "proofhash");
@@ -300,7 +296,7 @@ bool block_confirm(int coinid, const char *blockhash)
 		{
 			if(strcmp(block->hash1, hash) && strcmp(block->hash2, hash)) continue;
 			if (!block->confirmed) {
-				debuglog("*** CONFIRMED %d : %s", block->height, block->hash2);
+				debuglog("*** CONFIRMED %d : %s\n", block->height, block->hash2);
 				strncpy(block->hash, blockhash, 65);
 				block->confirmed = true;
 			}

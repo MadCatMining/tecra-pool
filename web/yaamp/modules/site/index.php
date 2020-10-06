@@ -17,127 +17,64 @@ $min_sunday = $min_payout/10;
 $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600)." hours";
 ?>
 
-
-
-
 <div id='resume_update_button' style='color: #444; background-color: #ffd; border: 1px solid #eea;
 	padding: 10px; margin-left: 20px; margin-right: 20px; margin-top: 15px; cursor: pointer; display: none;'
 	onclick='auto_page_resume();' align=center>
-    <b>Auto refresh is paused - Click to resume</b></div>
-    
- <!--  -->
+	<b>Auto refresh is paused - Click to resume</b></div>
 
-<div class="main-left-box"style='
-	 margin:1%'>
-<div class="main-left-title">Find miner address:</div>
-<div class="main-left-inner">
-<form action="/" method="get" style="padding: 10px;">
-<input type="text" name="address" class="main-text-input" placeholder="Wallet Address">
-<input type="submit" value="Submit" class="main-submit-button" ><br><br>
-</div>
-</div>
-</div>
+<table cellspacing=20 width=100%>
+<tr><td valign=top width=50%>
 
-<div style="text-align:center">
-<div style="text-align:center">
+<!--  -->
 
-
-<div id='pool_history_results' class="responsive-div-right">
-</div>
-
-
-<div id='pool_current_results' class="responsive-div-left" style="float:left">
-</div>
-
-
-</div>
-
-
-
-
-
-<div style="text-align:center">
-
-
-<div id='mining_tecracoin' class="responsive-div-right" style="float:right">
 <div class="main-left-box">
-<div class="main-left-title">MINING TECRACOIN</div>
+<div class="main-left-title">YII MINING POOLS</div>
 <div class="main-left-inner">
 
 <ul>
 
-
-
-    <li>
- <!--       <div style="width:100%;overflow:hidden;position:relative;padding:20px;font-size:1.0em;box-sizing:border-box"> -->
-           TecraCoin uses as proof of work algorithm a custom implementation of MTP called MTP-TCR. 
-           Miners supporting mtp-tcr can be found on <a href="https://github.com/tecracoin">official TecraCoin github<a> .
-        <!--/div-->
-    </li>
-    <li>
-        <!--div style="width:100%;overflow:hidden;position:relative;padding:20px;font-size:1.0em;font-weight:bold;text-align:center;box-sizing:border-box"-->
-            <a href="https://github.com/tecracoin/ccminer/releases/latest" style="padding: 10px 5px;display:inline-block" target="_blank">
-            &gt;&gt;For NVIDIA cards, download the lastest ccminer release &lt;&lt;</a><br/>
-            <a href="https://github.com/tecracoin/sgminer/releases/latest" style="padding: 10px 5px;display:inline-block" target="_blank">
-            &gt;&gt;For AMD cards, download the lastest sgminer release&lt;&lt;</a>
-
-        <!--/div-->
-    </li>
-    <li>
-        <!--div style="width:100%;overflow:hidden;position:relative;padding:20px;font-size:20px;font-weight:bold;text-align:center;box-sizing:border-box"-->
-            Join us on <A HREF="https://t.me/tecracoinio"> telegram</A>
-            and/or <A HREF="https://discordapp.com/invite/wA9Cpkd"> discord</a> for support and latest news<BR/><BR/>
-            -<i>TecraCoin Team</i>
-        <!--/div-->
-    </li>
-
-<li>
-<p class="main-left-box" style='padding: 3px; font-size: 1.1em; background-color: #ffffee; font-family: monospace;'>
-	-a mtp-tcr -o stratum+tcp://<?= YAAMP_STRATUM_URL ?>:&lt;PORT&gt; -u &lt;WALLET_ADDRESS&gt; [-p &lt;OPTIONS&gt;]</p>
-</li>
-
-    <?php if (YAAMP_ALLOW_EXCHANGE): ?>
-<li>&lt;WALLET_ADDRESS&gt; can be one of any currency we mine or a BTC address.</li>
-<?php else: ?>
-<li>&lt;WALLET_ADDRESS&gt; must be a valid TCR address. </li>
-<?php endif; ?>
-<li>As optional password, you can use: 
-    <li><b>-p c=&lt;SYMBOL&gt;</b> if yiimp does not set the currency correctly on the Wallet page.</li>
-    <li><b>-p d=&lt;difficulty&gt;</b> to start mining with a given difficulty higher than minimum pool default.</li>
-    <li><b>-p dm=&lt;difficulty&gt;</b> to impose a minimum difficulty higher than the pool default.</li>
-</li>    
-<li>See the "Pool Status" area on the right for PORT numbers.</li>
-
-<br>
-
-</ul>
-</div></div></div>
-
-<!--  -->
-<!--  -->
-<div class="responsive-div-left">
-<div id='tecra_mining_pool' style="margin-bottom:2%"/*class="responsive-div-left"*/>
-<div class="main-left-box">
-<div class="main-left-title">TECRACOIN MINING POOL</div>
-<div class="main-left-inner">
-
-<ul>
-
-<li>Based on YiiMP pool management solution using Yii Framework.</li>
+<li>YiiMP is a pool management solution based on the Yii Framework.</li>
+<li>This fork was based on the yaamp source code and is now an open source project.</li>
 <li>No registration is required, we do payouts in the currency you mine. Use your wallet address as the username.</li>
 <li>&nbsp;</li>
 <li>Payouts are made automatically every <?= $payout_freq ?> for all balances above <b><?= $min_payout ?></b>, or <b><?= $min_sunday ?></b> on Sunday.</li>
-<li>There is an initial delay before the first payout, please wait at least 6 hours before asking for support.</li>
+<li>For some coins, there is an initial delay before the first payout, please wait at least 6 hours before asking for support.</li>
 <li>Blocks are distributed proportionally among valid submitted shares.</li>
+
+<br/>
+
+</ul>
+</div></div>
+<br/>
+
+<!--  -->
+
+<div class="main-left-box">
+<div class="main-left-title">STRATUM SERVERS</div>
+<div class="main-left-inner">
+
+<ul>
+
+<li>
+<p class="main-left-box" style='padding: 3px; font-size: .8em; background-color: #ffffee; font-family: monospace;'>
+	-o stratum+tcp://<?= YAAMP_STRATUM_URL ?>:&lt;PORT&gt; -u &lt;WALLET_ADDRESS&gt; [-p &lt;OPTIONS&gt;]</p>
+</li>
+
+<?php if (YAAMP_ALLOW_EXCHANGE): ?>
+<li>&lt;WALLET_ADDRESS&gt; can be one of any currency we mine or a BTC address.</li>
+<?php else: ?>
+<li>&lt;WALLET_ADDRESS&gt; should be valid for the currency you mine. <b>DO NOT USE a BTC address here, the auto exchange is disabled</b>!</li>
+<?php endif; ?>
+<li>As optional password, you can use <b>-p c=&lt;SYMBOL&gt;</b> if yiimp does not set the currency correctly on the Wallet page.</li>
+<li>See the "Pool Status" area on the right for PORT numbers. Algorithms without associated coins are disabled.</li>
 
 <br>
 
 </ul>
-</div></div>
-<br>
-</div>
+</div></div><br>
 
-<div id='links'>
+<!--  -->
+
 <div class="main-left-box">
 <div class="main-left-title">LINKS</div>
 <div class="main-left-inner">
@@ -161,20 +98,31 @@ $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600)." hours";
 
 </ul>
 </div></div><br>
-</div>
-</div>
-</div>
-<!--  
+
+<!--  -->
 
 <a class="twitter-timeline" href="https://twitter.com/hashtag/YAAMP" data-widget-id="617405893039292417" data-chrome="transparent" height="450px" data-tweet-limit="3" data-aria-polite="polite">Tweets about #YAAMP</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";
-fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
- -->
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 
+</td><td valign=top>
+
+<!--  -->
+
+<div id='pool_current_results'>
+<br><br><br><br><br><br><br><br><br><br>
 </div>
+
+<div id='pool_history_results'>
+<br><br><br><br><br><br><br><br><br><br>
 </div>
-<div  class="responsive-div-left"></div>
-<div  class="responsive-div-left"></div>
+
+</td></tr></table>
+
+<br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
+
 <script>
 
 function page_refresh()

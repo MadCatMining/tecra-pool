@@ -17,79 +17,52 @@ echo <<<end
 	onclick='auto_page_resume();' align=center>
 <b>Auto refresh is paused - Click to resume</b></div>
 
-<div  class="responsive-div-left"></div>
+<table cellspacing=20 width=100%>
+<tr><td valign=top width=50%>
 
-<div style="text-align:center">
-
-<div style="text-align:center">
-
-<div id='mining_results'  class="responsive-div-left" style="float:left"></div>
-
-<div id='pool_current_results' class="responsive-div-right"></div>
-<br>
+<div id='mining_results'>
+<br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
 </div>
-
 end;
 
 if($algo != 'all')
 echo <<<end
-<div  class="responsive-div-left"></div>
-
-<div style="text-align:center">
-
-<div class="responsive-div-right" >
-<div class="main-left-box" >
+<div class="main-left-box">
 <div class="main-left-title">Last 24 Hours Estimate ($algo)</div>
 <div class="main-left-inner"><br>
 <div id='graph_results_price' style='height: $height;'></div><br>
-</div></div>
-</div>
+</div></div><br>
 
-<div class="responsive-div-left" style="float:left">
-<div class="main-left-box"  >
+<div class="main-left-box">
 <div class="main-left-title">Last 24 Hours Hashrate ($algo)</div>
 <div class="main-left-inner"><br>
 <div id='pool_hashrate_results' style='height: $height;'></div><br>
 </div></div><br>
-</div>
-</div>
-</div>
 end;
-
-
 
 $algo_unit = 'Mh';
 $algo_factor = yaamp_algo_mBTC_factor($algo);
 if ($algo_factor == 1000) $algo_unit = 'Gh';
 
-
-
-//echo '</div>';
-//echo '</div>';
 echo <<<end
+</td><td valign=top>
 
-
+<div id='pool_current_results'>
+<br><br><br><br><br><br><br><br><br><br>
 </div>
 
-<div style="text-align:center">
-
-<div class="responsive-div-right" style="float:right">
-<div id='found_results'></div>
+<div id='found_results'>
+<br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
 </div>
 
-<div id='miners_results' class="responsive-div-left">
-</div>
-<br>
+</td></tr></table>
 
-</div>
-
-
-
-<div  class="responsive-div-right" style="float:right"></div>
-<div  class="responsive-div-left"></div>
-<div style="text-align:center"></div>
-</div>
-
+<br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br>
 
 <script>
 
@@ -105,7 +78,6 @@ function page_refresh()
 	pool_current_refresh();
 	mining_refresh();
 	found_refresh();
-	miners_refresh();
 
 	if(global_algo != 'all')
 	{
@@ -193,31 +165,16 @@ function graph_init_price(data)
 
 		grid:
 		{
-			borderWidth: 0.5,
+			borderWidth: 1,
 			shadowWidth: 0,
 			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+			background: '#ffffff'
 		},
 
 	});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 ///////////////////////////////////////////////////////////////////////
-
-function miners_ready(data)
-{
-	$('#miners_results').html(data);
-}
-
-function miners_refresh()
-{
-	var url = "/site/miners_results";
-	$.get(url, '', miners_ready);
-}
 
 function pool_hashrate_ready(data)
 {
@@ -249,46 +206,26 @@ function pool_hashrate_graph_init(data)
 				tickOptions: {formatString: '<font size=1>%#.3f &nbsp;</font>'}
 			}
 		},
-/*
+
 		seriesDefaults:
 		{
 			markerOptions: { style: 'none' }
 		},
-*/		
 
-		series: 
-		[ {
-			color: "#C35F08",
-/*			highlightColors: ['white'], */
-			fill: true			
-		}, 
-		{
-			color: "#328ba8", 
-/*			highlightColors: ['white','lightpink', 'lightsalmon'],*/
-			markerOptions: { style: 'none' }
-		}],
 		grid:
 		{
-			borderWidth: 0.5,
+			borderWidth: 1,
 			shadowWidth: 0,
 			shadowDepth: 0,
-			background: '#0',
-			gridLineWidth: 0.25,
-			gridLineColor: 'grey'
+			background: '#ffffff'
 		},
 
 		highlighter:
 		{
-			show: true,
-			useAxesFormatters: false,
-			tooltipAxes: 'y',
-			tooltipFormatString: '%s Mh/s'			
-		}
+			show: true
+		},
 
 	});
-	$('.jqplot-highlighter-tooltip').css({color:'rgb(192, 189, 189)','background': 'rgb(71, 71, 71)', 'padding': '2px 5px'});
-	$(window).resize(function() {
-		plot1.replot( { resetAxes: true ,axes:{yaxis:{min:0}}}  );});
 }
 
 </script>

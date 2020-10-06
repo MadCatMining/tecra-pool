@@ -62,7 +62,7 @@ void job_relock_clients(int jobid_old, int jobid_new)
 		YAAMP_CLIENT *client = (YAAMP_CLIENT *)li->data;
 		if(client->jobid_locked != jobid_old) continue;
 
-//		debuglog("relock job %x to %x", client->jobid_locked, jobid_new);
+//		debuglog("relock job %x to %x\n", client->jobid_locked, jobid_new);
 		client->jobid_locked = jobid_new;
 	}
 
@@ -82,7 +82,7 @@ void job_assign_locked_clients(YAAMP_JOB *job)
 		YAAMP_CLIENT *client = (YAAMP_CLIENT *)li->data;
 		if(client->jobid_locked != job->id) continue;
 
-//		debuglog("assign job %x %x", client->jobid_locked, job->id);
+//		debuglog("assign job %x %x\n", client->jobid_locked, job->id);
 
 		client->jobid_next = job->id;
 		job->remote_subids[client->extranonce1_id] = true;
@@ -105,7 +105,7 @@ void job_unlock_clients(YAAMP_JOB *job)
 		if(client->jobid_locked == client->jobid_next) continue;
 		if(job && client->jobid_locked != job->id) continue;
 
-//		debuglog("unlock job %x %x", client->jobid_locked, job->id);
+//		debuglog("unlock job %x %x\n", client->jobid_locked, job->id);
 		client->jobid_locked = 0;
 	}
 

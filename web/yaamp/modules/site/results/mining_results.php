@@ -221,13 +221,13 @@ if(isset($price_rent) && $showrental)
 
 
 echo "</table>";
-/*
+
 echo '<p style="font-size: .8em;">
 	&nbsp;*** estimated average time to find a block at full pool speed<br/>
 	&nbsp;** approximate from the last 5 minutes submitted shares<br/>
 	&nbsp;* 24h estimation from net difficulty in mBTC/MH/day (GH/day for sha & blake algos)<br>
 </p>';
-*/
-echo "</div></div>";
+
+echo "</div></div><br>";
 
 

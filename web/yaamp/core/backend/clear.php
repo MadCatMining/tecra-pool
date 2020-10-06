@@ -8,7 +8,6 @@ function BackendClearEarnings($coinid = NULL)
 		$delay = time() - (int) YAAMP_PAYMENTS_FREQ;
 	else
 		$delay = time() - (YAAMP_PAYMENTS_FREQ / 2);
-
 	$total_cleared = 0.0;
 
 	$sqlFilter = $coinid ? " AND coinid=".intval($coinid) : '';

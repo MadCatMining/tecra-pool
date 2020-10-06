@@ -12,10 +12,11 @@ struct YAAMP_ALGO
 {
 	char name[64];
 	YAAMP_HASH_FUNCTION hash_function;
+
 	double diff_multiplier;
 	double factor;
 	YAAMP_HASH_FUNCTION merkle_func;
-	YAAMP_MTP_HASH_FUNCTION mtp_function;
+
 	double profit;
 	double rent;
 
@@ -62,21 +63,16 @@ public:
 	char worker[1024];
 
 	double difficulty_actual;
-	double difficulty_minimal;
 	double difficulty_remote;
 	double difficulty_written;
 	bool difficulty_fixed;
-	bool difficulty_min;
 
 	long long last_submit_time;
 	double shares_per_minute;
-	double avg_timeshare;
-	int dtime_shares;	
-	int Ndelta;
-	uint32_t lastRtc;
+
 	char extranonce1[32];
 	int extranonce2size;
-	long long start_time;
+
 	char extranonce1_default[32];
 	int extranonce2size_default;
 
@@ -88,10 +84,8 @@ public:
 
 	bool extranonce_subscribe;
 	int submit_bad;
-	int delta_bad;
 
 	double speed;
-	double sum_difficulty;
 	int extranonce1_id;
 
 	int jobid_next;
@@ -141,34 +135,23 @@ bool client_find_my_ip(const char *ip);
 //////////////////////////////////////////////////////////////////////////
 
 int client_send_difficulty(YAAMP_CLIENT *client, double difficulty);
-
-int client_send_target_mtp(YAAMP_CLIENT *client, double difficulty);
-
 double client_normalize_difficulty(double difficulty);
 
 void client_change_difficulty(YAAMP_CLIENT *client, double difficulty);
-void client_change_difficulty_mtp(YAAMP_CLIENT *client, double difficulty);
 void client_record_difficulty(YAAMP_CLIENT *client);
 void client_adjust_difficulty(YAAMP_CLIENT *client);
-void client_adjust_difficulty_mtp(YAAMP_CLIENT *client);
+
 void client_initialize_difficulty(YAAMP_CLIENT *client);
 
 //////////////////////////////////////////////////////////////////////////
 
 int client_call(YAAMP_CLIENT *client, const char *method, const char *format, ...);
-int client_call_mtp(YAAMP_CLIENT *client, const char *method, const char *format, ...);
-
 int client_ask(YAAMP_CLIENT *client, const char *method, const char *format, ...);
-int client_ask_mtp(YAAMP_CLIENT *client, const char *method, const char *format, ...);
 
 void client_dump_all();
 
 int client_send_result(YAAMP_CLIENT *client, const char *format, ...);
-int client_send_result_mtp(YAAMP_CLIENT *client, const char *format, ...);
-
-
 int client_send_error(YAAMP_CLIENT *client, int error, const char *string);
-int client_send_error_mtp(YAAMP_CLIENT *client, int error, const char *string);
 
 bool client_ask_stats(YAAMP_CLIENT *client);
 

@@ -83,6 +83,40 @@ json_value *json_get_object(json_value *json, const char *name)
 	return NULL;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+FILE *g_debuglog = NULL;
+FILE *g_stratumlog = NULL;
+FILE *g_clientlog = NULL;
+FILE *g_rejectlog = NULL;
+
+void initlog(const char *algo)
+{
+	char debugfile[1024];
+
+	sprintf(debugfile, "%s.log", algo);
+	g_debuglog = fopen(debugfile, "w");
+
+	g_stratumlog = fopen("stratum.log", "a");
+	g_clientlog = fopen("client.log", "a");
+	g_rejectlog = fopen("reject.log", "a");
+}
+
+void closelogs()
+{
+	if (g_debuglog) {
+		fflush(g_debuglog); fclose(g_debuglog);
+	}
+	if (g_stratumlog) {
+		fflush(g_stratumlog); fclose(g_stratumlog);
+	}
+	if (g_clientlog) {
+		fflush(g_clientlog); fclose(g_clientlog);
+	}
+	if (g_rejectlog) {
+		fflush(g_rejectlog); fclose(g_rejectlog);
+	}
+}
 
 void clientlog(YAAMP_CLIENT *client, const char *format, ...)
 {
@@ -118,14 +152,136 @@ void clientlog(YAAMP_CLIENT *client, const char *format, ...)
 		if (fflush(g_clientlog) == EOF) {
 			// reopen if wiped
 			fclose(g_clientlog);
-			g_clientlog = open_log("client.log");
+			g_clientlog = fopen("client.log", "a");
 		}
 	}
 }
 
+void debuglog(const char *format, ...)
+{
+	char buffer[YAAMP_SMALLBUFSIZE];
+	va_list args;
+
+	va_start(args, format);
+	vsprintf(buffer, format, args);
+	va_end(args);
+
+	time_t rawtime;
+	struct tm * timeinfo;
+	char buffer2[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer2, 80, "%H:%M:%S", timeinfo);
+	printf("%s: %s", buffer2, buffer);
+
+	if(g_debuglog)
+	{
+		fprintf(g_debuglog, "%s: %s", buffer2, buffer);
+		fflush(g_debuglog);
+	}
+}
+
+void debuglog_hex(void *data, int len)
+{
+	uint8_t* const bin = (uint8_t*) data;
+	char *hex = (char*) calloc(1, len*2 + 2);
+	if (!hex) return;
+	for(int i=0; i < len; i++)
+		sprintf(hex+strlen(hex), "%02x", bin[i]);
+	strcpy(hex+strlen(hex), "\n");
+	debuglog(hex);
+	free(hex);
+}
+
+void stratumlog(const char *format, ...)
+{
+	char buffer[YAAMP_SMALLBUFSIZE];
+	va_list args;
+
+	va_start(args, format);
+	vsprintf(buffer, format, args);
+	va_end(args);
+
+	time_t rawtime;
+	struct tm * timeinfo;
+	char buffer2[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer2, 80, "%H:%M:%S", timeinfo);
+	printf("%s: %s", buffer2, buffer);
+
+	if(g_debuglog)
+	{
+		fprintf(g_debuglog, "%s: %s", buffer2, buffer);
+		fflush(g_debuglog);
+	}
+
+	if(g_stratumlog)
+	{
+		fprintf(g_stratumlog, "%s: %s", buffer2, buffer);
+		if (fflush(g_stratumlog) == EOF) {
+			fclose(g_stratumlog);
+			g_stratumlog = fopen("stratum.log", "a");
+		}
+	}
+}
+
+void stratumlogdate(const char *format, ...)
+{
+	char buffer[YAAMP_SMALLBUFSIZE];
+	char date[16];
+	va_list args;
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	strftime(date, 16, "%Y-%m-%d", timeinfo);
+
+	va_start(args, format);
+	vsprintf(buffer, format, args);
+	va_end(args);
+
+	stratumlog("%s %s", date, buffer);
+}
+
+void rejectlog(const char *format, ...)
+{
+	char buffer[YAAMP_SMALLBUFSIZE];
+	va_list args;
+
+	va_start(args, format);
+	vsnprintf(buffer, YAAMP_SMALLBUFSIZE-1, format, args);
+	va_end(args);
+
+	time_t rawtime;
+	struct tm * timeinfo;
+	char buffer2[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer2, 80, "%Y-%m-%d %H:%M:%S", timeinfo);
+	printf("%s: %s", buffer2, buffer);
+
+	if(g_rejectlog)
+	{
+		fprintf(g_rejectlog, "%s: %s", buffer2, buffer);
+		if (fflush(g_rejectlog) == EOF) {
+			fclose(g_rejectlog);
+			g_rejectlog = fopen("reject.log", "a");
+		}
+	}
+}
+
+
 bool yaamp_error(char const *message)
 {
-	debuglog("yaamp ERROR: %d %s", errno, message);
+	debuglog("ERROR: %d %s\n", errno, message);
 	closelogs();
 	exit(1);
 }
@@ -158,8 +314,8 @@ const char *header_value(const char *data, const char *search, char *value)
 		return value;
 	}
 
-	strncpy(value, p, min(1024, (int)(p2 - p)));
-	value[min(1023, (int)(p2 - p))] = 0;
+	strncpy(value, p, min(1024, p2 - p));
+	value[min(1023, p2 - p)] = 0;
 
 	return value;
 }
@@ -323,6 +479,26 @@ void ser_number(int n, char *a)
 //	printf("ser_number %d, %s\n", n, a);
 }
 
+void ser_compactsize(uint64_t nSize, char *a)
+{
+	if (nSize < 253)
+	{
+		sprintf(a, "%02lx", nSize);
+	}
+	else if (nSize <= (unsigned short)-1)
+	{
+		sprintf(a, "%02x%04lx", 253, nSize);
+	}
+	else if (nSize <= (unsigned int)-1)
+	{
+		sprintf(a, "%02x%08lx", 254, nSize);
+	}
+	else
+	{
+		sprintf(a, "%02x%016lx", 255, nSize);
+	}
+}
+
 void ser_string_be(const char *input, char *output, int len)
 {
 	for(int i=0; i<len; i++)
@@ -391,14 +567,14 @@ uint64_t decode_compact(const char *input)
 	}
 
 	uint64_t v = 0x0000ffff00000000/d;
-//	debuglog("decode_compact %s -> %f -> %016llx", input, d, v);
+//	debuglog("decode_compact %s -> %f -> %016llx\n", input, d, v);
 
 //	int nbytes = (c >> 24) & 0xFF;
 //
 //	nbytes -= 25;
 //	v = (c & 0xFFFFFF) << (8 * nbytes);
 //
-//	debuglog("decode_compact %s -> %016llx", input, v);
+//	debuglog("decode_compact %s -> %016llx\n", input, v);
 	return v;
 }
 
@@ -424,7 +600,7 @@ uint64_t get_hash_difficulty(unsigned char *input)
 
 //	char toto[1024];
 //	hexlify(toto, input, 32);
-//	debuglog("hash diff %s %016llx", toto, v);
+//	debuglog("hash diff %s %016llx\n", toto, v);
 	return v;
 }
 
@@ -605,18 +781,6 @@ void sha256_double_hash_hex(const char *input, char *output, unsigned int len)
 	hexlify(output, (unsigned char *)output1, 32);
 }
 
-void sha256_double_hash_hex_le(const char *input, char *output, unsigned int len)
-{
-	char output1[32];
-
-	sha256_double_hash(input, output1, len);
-	for (int i=0;i<8;i++)
-		((uint32_t*)output1)[i] = bswap32(((uint32_t*)output1)[i]);
-
-	hexlify(output, (unsigned char *)output1, 32);
-}
-
-
 void sha256_hash_hex(const char *input, char *output, unsigned int len)
 {
 	char output1[32];
@@ -625,20 +789,27 @@ void sha256_hash_hex(const char *input, char *output, unsigned int len)
 	hexlify(output, (unsigned char *)output1, 32);
 }
 
-// Only used by stratum pools
-void diff_to_target(uint32_t *target, double diff)
+uint64_t share_to_target(double diff)
 {
-	uint64_t m;
-	int k;
-
-	for (k = 6; k > 0 && diff > 1.0; k--)
-		diff /= 4294967296.0;
-	m = (uint64_t)(4294901760.0 / diff);
-	if (m == 0 && k == 6)
-		memset(target, 0xff, 32);
-	else {
-		memset(target, 0, 32);
-		target[k] = (uint32_t)m;
-		target[k + 1] = (uint32_t)(m >> 32);
-	}
+        int i, shift = 29;
+        unsigned char targ[32];
+        for (i=0; i<32; i++)
+            targ[i]=0;
+        double ftarg = (double)0x0000ffff / diff;
+        while (ftarg < (double)0x00008000) {
+            shift--;
+            ftarg *= 256.0;
+        }
+        while (ftarg >= (double)0x00800000) {
+            shift++;
+            ftarg /= 256.0;
+        }
+        uint32_t nBits = (int)ftarg + (shift << 24);
+        shift = (nBits >> 24) & 0x00ff;
+        nBits &= 0x00FFFFFF;
+        targ[shift - 1] = nBits >> 16;
+        targ[shift - 2] = nBits >> 8;
+        targ[shift - 3] = nBits;
+        uint64_t starget = * (uint64_t *) &targ[24];
+        return (starget);
 }

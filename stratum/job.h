@@ -1,3 +1,4 @@
+
 #define MAX_AUXS	32
 
 class YAAMP_REMOTE;
@@ -7,7 +8,6 @@ class YAAMP_COIND_AUX;
 struct YAAMP_JOB_VALUES
 {
 	char coinbase[4*1024];
-        char coinbase_be[4*1024];
 	char merkleroot_be[1024];
 
 	char header[1024];
@@ -17,22 +17,6 @@ struct YAAMP_JOB_VALUES
 	char hash_hex[1024];
 	char hash_be[1024];
 	unsigned char hash_bin[1024];
-// mtp stuff 
-
-	char proofmtp_str[2 * SizeProofMTP + 1];
-	char blockmtp_str[2 * SizeBlockMTP + 1];
-	char merkleroot_str[2 * SizeMerkleRoot + 1];
-	char mtphashvalue_str[2 * SizeMtpHash + 1];
-	char mtpreserved_str[2 * SizeReserved + 1];
-
-/*
-	char *proofmtp_str;
-	char *blockmtp_str;
-	char *merkleroot_str;
-	char *mtphashvalue_str;
-	char *mtpreserved_str;
-*/
-
 };
 
 struct YAAMP_JOB_TEMPLATE
@@ -59,12 +43,6 @@ struct YAAMP_JOB_TEMPLATE
 	char version[32];
 	char nbits[32];
 	char ntime[32];
-
-/* mtp arrays */
-	unsigned char MerkleRoot[16]; // 128bit
-	unsigned char mtpHashValue[32]; // 256bit
-	uint64_t nBlockMTP[MTP_L * 2][128]; // 2x MTP_L blocks of 128 64bits
-	unsigned char nProofMTP[MTP_L * 3 * 353]; // 3x MTP_L x size of merkletree elements (353bits)
 
 	int height;
 	int target;
@@ -94,7 +72,7 @@ public:
 	char name[1024];
 
 	int count;
-	double speed; 
+	double speed;
 
 	double maxspeed;
 	double profit;
@@ -109,18 +87,13 @@ public:
 inline void job_delete(YAAMP_OBJECT *object)
 {
 	YAAMP_JOB *job = (YAAMP_JOB *)object;
-	if (!job) 
-		return;
-
+	if (!job) return;
 	if (job->templ && job->templ->txcount) {
 		job->templ->txsteps.clear();
 		job->templ->txdata.clear();
 	}
-	if (job->templ) 
-			delete job->templ;
-
+	if (job->templ) delete job->templ;
 	delete job;
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

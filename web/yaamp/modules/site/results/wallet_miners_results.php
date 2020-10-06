@@ -10,9 +10,19 @@ if ($coinid) {
 }
 
 echo "<div class='main-left-box'>";
-//echo "<div class='main-left-title'>Miners: {$user->username}</div>";
-echo "<div class='main-left-title'>Workers</div>";
+echo "<div class='main-left-title'>Miners: {$user->username}</div>";
 echo "<div class='main-left-inner'>";
+
+echo '<table class="dataGrid2">';
+echo "<thead>";
+echo "<tr>";
+echo "<th align=left>Summary</th>";
+echo "<th align=right>Miners</th>";
+echo "<th align=right>Shares</th>";
+echo "<th align=right width=80>Hashrate*</th>";
+echo "<th align=right width=60>Reject*</th>";
+echo "</tr>";
+echo "</thead>";
 
 foreach(yaamp_get_algos() as $algo)
 {
@@ -31,6 +41,7 @@ foreach(yaamp_get_algos() as $algo)
 
 		$user_shares = controller()->memcache->get_database_scalar("wallet_user_shares-$userid-$algo",
 			"SELECT SUM(difficulty) FROM shares WHERE valid AND userid=$userid AND algo=:algo", array(':algo'=>$algo));
+		if(!$user_shares && !$minercount) continue;
 
 		$total_shares = controller()->memcache->get_database_scalar("wallet_total_shares-$algo",
 			"SELECT SUM(difficulty) FROM shares WHERE valid AND algo=:algo", array(':algo'=>$algo));
@@ -39,7 +50,7 @@ foreach(yaamp_get_algos() as $algo)
 		// we know the single currency mined if auto exchange is disabled
 		$user_shares = controller()->memcache->get_database_scalar("wallet_user_shares-$algo-$coinid-$userid",
 			"SELECT SUM(difficulty) FROM shares WHERE valid AND userid=$userid AND coinid=$coinid AND algo=:algo", array(':algo'=>$algo));
-
+		if(!$user_shares) continue;
 
 		$total_shares = controller()->memcache->get_database_scalar("wallet_coin_shares-$coinid",
 			"SELECT SUM(difficulty) FROM shares WHERE valid AND coinid=$coinid AND algo=:algo", array(':algo'=>$algo));
@@ -48,9 +59,16 @@ foreach(yaamp_get_algos() as $algo)
 	if(!$total_shares) continue;
 	$percent_shares = round($user_shares * 100 / $total_shares, 4);
 
+	echo '<tr class="ssrow">';
+	echo '<td><b>'.$algo.'</b></td>';
+	echo '<td align="right">'.$minercount.'</td>';
+	echo '<td align="right" width="100">'.$percent_shares.'%</td>';
+	echo '<td align="right" width="100"><b>'.$user_rate1.'</b></td>';
+	echo '<td align="right">'.$percent_bad.'</td>';
+	echo '</tr>';
 }
 
-//echo "</table>";
+echo "</table>";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -61,7 +79,7 @@ if(count($workers))
 	echo "<table  class='dataGrid2'>";
 	echo "<thead>";
 	echo "<tr>";
-	echo "<th align=left>Miner</th>";
+	echo "<th align=left>Details</th>";
 	if ($this->admin) echo "<th>IP</th>";
 	echo "<th align=left>Extra</th>";
 	echo "<th align=left>Algo</th>";
@@ -86,6 +104,8 @@ if(count($workers))
 
 		$version = substr($worker->version, 0, 20);
 		$password = substr($worker->password, 0, 32);
+		if (empty($password) && !empty($worker->worker))
+			$password = substr($worker->worker, 0, 32);
 
 		$subscribe = Booltoa($worker->subscribe);
 
@@ -102,21 +122,16 @@ if(count($workers))
 	}
 
 	echo "</table>";
+}
 
 echo "</div>";
 
 echo "<p style='font-size: .8em'>
 		&nbsp;* approximate from the last 5 minutes submitted shares<br>
 		&nbsp;** extranonce.subscribe<br>
-		</p>";	
-} else 
-{
-echo "<center ><strong>no active worker</strong></center>";	
-}
+		</p>";
 
-
-
-echo "</div>";
+echo "</div><br>";
 
 
 

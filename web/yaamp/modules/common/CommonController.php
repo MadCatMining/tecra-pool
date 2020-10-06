@@ -25,14 +25,13 @@ class CommonController extends CController
 		if(user()->getState('yaamp_admin')) {
 			$this->admin = true;
 			$client_ip = arraySafeVal($_SERVER,'REMOTE_ADDR');
-			if (0 && !isAdminIP($client_ip)) {
+			if (!isAdminIP($client_ip)) {
 				user()->setState('yaamp_admin', false);
 				debuglog("admin attempt from $client_ip");
 				$this->admin = false;
 			}
 		}
 
-//        $this->admin = true;
 		$algo = user()->getState('yaamp-algo');
 		if(!$algo) user()->setState('yaamp-algo', YAAMP_DEFAULT_ALGO);
 

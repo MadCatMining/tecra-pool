@@ -51,7 +51,7 @@ $list = getdbolist('db_coins', "enable and visible order by name");
 foreach($list as $coin)
 {
 	if($coin->symbol == 'BTC') continue;
-	if(empty($coin->symbol2)) continue;
+	if(!empty($coin->symbol2)) continue;
 
 	$coin->version = formatWalletVersion($coin);
 

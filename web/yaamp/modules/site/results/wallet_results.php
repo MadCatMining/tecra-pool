@@ -1,29 +1,11 @@
 <?php
-/*
+
 function WriteBoxHeader($title)
 {
 	echo "<div class='main-left-box'>";
 	echo "<div class='main-left-title'>$title</div>";
 	echo "<div class='main-left-inner'>";
 }
-*/
-function WriteBoxHeader($title)
-{
-/*	
-	echo "<div class='main-left-box'>";
-	echo "<div class='main-left-title'>$title</div>";
-	echo "<div class='main-left-inner'>";
-*/	
-
-	echo "<div class='main-left-box'>";
-	echo "<div class='main-left-title' id='main-left-title2'>$title <span style='float:right'><strong>(expand)</strong></span></div>";
-	echo "<br>";
-	echo "<div class='main-left-inner' id='summary_div' style='display:inline;vertical-align:super'></div>";
-	echo "<div class='main-left-inner' id='main-left-inner2' style='display:none'>";
-
-}
-
-
 
 $mining = getdbosql('db_mining');
 $defaultalgo = user()->getState('yaamp-algo');
@@ -33,10 +15,9 @@ $show_details = getparam('showdetails');
 $user = getuserparam(getparam('address'));
 if(!$user) return;
 
-//WriteBoxHeader("Wallet: $user->username");
+WriteBoxHeader("Wallet: $user->username");
 
 $refcoin = getdbo('db_coins', $user->coinid);
-/*
 if(!$refcoin)
 {
 	if($user->coinid != null)
@@ -64,7 +45,7 @@ echo "<th align=right>Total</th>";
 echo "<th align=right>Value*</th>";
 echo "</tr>";
 echo "</thead>";
-*/
+
 $total_pending = 0;
 
 if($show_details)
@@ -98,7 +79,7 @@ if($show_details)
 			$confirmed = altcoinvaluetoa($confirmed);
 			$unconfirmed = altcoinvaluetoa($unconfirmed);
 			$total = altcoinvaluetoa($total);
-/*
+
 			echo "<tr class='ssrow'>";
 			echo "<td width=18><img width=16 src='$coin->image'></td>";
 			echo "<td><b><a href='/site/block?id=$coin->id' title='$coin->version'>$name</a></b><span style='font-size: .8em'> ($coin->algo)</span></td>";
@@ -106,10 +87,9 @@ if($show_details)
 			echo "<td align=right style='font-size: .8em;'>$unconfirmed</td>";
 			echo "<td align=right style='font-size: .8em;'>$confirmed</td>";
 			echo "<td align=right style='font-size: .8em;'>$total</td>";
-			echo "<td align=right style='font-size: .8em;'>$value $refcoin->symbol2</td>";
+			echo "<td align=right style='font-size: .8em;'>$value $refcoin->symbol</td>";
 
 			echo "</tr>";
-*/			
 		}
 	}
 
@@ -133,7 +113,7 @@ $confirmed = $confirmed? bitcoinvaluetoa($confirmed): '';
 $unconfirmed = $unconfirmed? bitcoinvaluetoa($unconfirmed): '';
 //$total_usd = number_format($total_unsold*$mining->usdbtc*$refcoin->price, 3, '.', ' ');
 $total_pending = bitcoinvaluetoa($total_pending);
-/*
+
 if(!$show_details && $total_unsold > 0)
 {
 	echo '
@@ -160,7 +140,7 @@ echo '<br/><span style="font-size: .8em;"">(total pending)</span></b></td>';
 echo '<td valign="top" align="right" style="font-size: .8em;">'.$unconfirmed.'</td>';
 echo '<td valign="top" align="right" style="font-size: .8em;">'.$confirmed.'</td>';
 echo '<td valign="top" align="right" style="font-size: .8em;"></td>';
-echo '<td valign="top" align="right" style="font-size: .8em;">'.$total_unsold.' '.$refcoin->symbol2.'</td>';
+echo '<td valign="top" align="right" style="font-size: .8em;">'.$total_unsold.' '.$refcoin->symbol.'</td>';
 
 echo "</tr>";
 
@@ -183,7 +163,7 @@ echo "<tr class='ssrow' style='border-top: 1px solid #eee;'>";
 echo "<td><img width=16 src='$refcoin->image'></td>";
 echo "<td colspan=3><b>Balance</b></td>";
 echo "<td align=right style='font-size: .8em;'><b></b></td>";
-echo "<td align=right style='font-size: .9em;'><b>$balance $refcoin->symbol2</b></td>";
+echo "<td align=right style='font-size: .9em;'><b>$balance $refcoin->symbol</b></td>";
 echo "</tr>";
 
 ////////////////////////////////////////////////////////////////////////////
@@ -195,7 +175,7 @@ echo "<tr class='ssrow' style='border-top: 3px solid #eee;'>";
 echo "<td><img width=16 src='$refcoin->image'></td>";
 echo "<td colspan=3><b>Total Unpaid</b></td>";
 echo "<td align=right style='font-size: .8em;'></td>";
-echo "<td align=right style='font-size: .9em;'>$total_unpaid $refcoin->symbol2</td>";
+echo "<td align=right style='font-size: .9em;'>$total_unpaid $refcoin->symbol</td>";
 echo "</tr>";
 
 ////////////////////////////////////////////////////////////////////////////
@@ -210,7 +190,7 @@ echo "<tr class='ssrow' style='border-top: 1px solid #eee;'>";
 echo "<td><img width=16 src='$refcoin->image'></td>";
 echo "<td colspan=3><b>Total Paid</b></td>";
 echo "<td align=right style='font-size: .8em;'></td>";
-echo "<td align=right style='font-size: .9em;'><a href='javascript:main_wallet_tx()'>$total_paid $refcoin->symbol2</a></td>";
+echo "<td align=right style='font-size: .9em;'><a href='javascript:main_wallet_tx()'>$total_paid $refcoin->symbol</a></td>";
 echo "</tr>";
 
 ////////////////////////////////////////////////////////////////////////////
@@ -224,7 +204,7 @@ echo "<tr class='ssrow' style='border-top: 3px solid #eee;'>";
 echo "<td><img width=16 src='$refcoin->image'></td>";
 echo "<td colspan=3><b>Total Earned</b></td>";
 echo "<td align=right style='font-size: .8em;'></td>";
-echo "<td align=right style='font-size: .9em;'>$total_earned $refcoin->symbol2</td>";
+echo "<td align=right style='font-size: .9em;'>$total_earned $refcoin->symbol</td>";
 echo "</tr>";
 
 echo "</table>";
@@ -241,18 +221,18 @@ echo '</p>';
 
 if ($refcoin->payout_min) {
 	echo '<p style="font-size: .8em; padding-left: 4px;">';
-	echo '<b>Note:</b> Minimum payout for this wallet is '.($refcoin->payout_min).' '.$refcoin->symbol2;
+	echo '<b>Note:</b> Minimum payout for this wallet is '.($refcoin->payout_min).' '.$refcoin->symbol;
 	echo '</p>';
 }
 
 echo '</div><br/>';
-*/
-$header = "Most recent Payouts: " /*.$user->username*/;
+
+$header = "Last 24 Hours Payouts: ".$user->username;
 WriteBoxHeader($header);
 
-$t = time()-24*60*60*65;
-//$list = getdbolist('db_payouts', "account_id={$user->id} AND time>$t ORDER BY time DESC");
-$list = getdbolist('db_payouts', "account_id={$user->id}  ORDER BY time DESC LIMIT 10");
+$t = time()-24*60*60;
+$list = getdbolist('db_payouts', "account_id={$user->id} AND time>$t ORDER BY time DESC");
+
 echo "<table  class='dataGrid2'>";
 
 echo "<thead>";
@@ -284,15 +264,15 @@ foreach($list as $payout)
 }
 
 $amount = bitcoinvaluetoa($total);
-/*
+
 echo <<<end
 <tr class="ssrow">
-<td align="right"><b>Total:</b></td>
-<td align="right"><b>$amount TCR</b></td>
+<td align="right">Total:</td>
+<td align="right"><b>{$amount}</b></td>
 <td></td>
 </tr>
 end;
-*/
+
 // Search extra Payouts which were not in the db (yiimp payout check command)
 // In this case, the id are greater than last 24h ones and the fee column is filled
 $list_extra = getdbolist('db_payouts', "account_id={$user->id} AND id>$firstid AND fee > 0.0 ORDER BY time DESC");
@@ -314,7 +294,7 @@ if (!empty($list_extra)) {
 	</tr>
 end;
 
-	$total2 = 0.0;
+	$total = 0.0;
 	foreach($list_extra as $payout)
 	{
 		$d = datetoa2($payout->time);
@@ -330,19 +310,18 @@ end;
 		echo '<td style="font-family: monospace;">'.$link.'</td>';
 		echo '</tr>';
 
-		$total2 += $payout->amount;
+		$total += $payout->amount;
 	}
 
-	$amount = bitcoinvaluetoa($total2);
+	$amount = bitcoinvaluetoa($total);
 
-/*	echo <<<end
+	echo <<<end
 	<tr class="ssrow" style="color: darkred;">
 	<td align="right">Total:</td>
-	<td align="right"><b>{$amount} TCR</b></td>
+	<td align="right"><b>{$amount}</b></td>
 	<td></td>
 	</tr>
 end;
-*/
 }
 
 
@@ -351,33 +330,7 @@ echo "</div>";
 
 echo "</div><br>";
 
-echo <<<EOT
-<div id="total_amount" style="display:none">$amount</div>
-<script>
-var coll = document.getElementById("main-left-title2");
-var amount = document.getElementById("total_amount").textContent;
-	  var summary = document.getElementById("summary_div");
-	  	  summary.innerHTML = '<b>Total:'+amount+' TCR</b>';
-  coll.addEventListener("click", function() {
-    this.classList.toggle("active");
-/*    var content = this.nextElementSibling;*/
-	  var content = document.getElementById("main-left-inner2");
 
-    if (content.style.display === "inline") {
-		this.innerHTML = "Most Recent Payouts <span style='float:right'><strong>(expand)</strong></span>";
-	  content.style.display = "none" ;
-
-		
-    } else {
-	  content.style.display = "inline";
-
-	  this.innerHTML = "Most Recent Payouts <span style='float:right;'><strong>(collapse)</strong></span>";
-    }
-  });
-
-</script>
-
-EOT;
 
 
 

@@ -44,34 +44,14 @@ for($i = $t+$step, $j = 0; $i < time(); $i += $step)
 echo '],[';
 
 $average = $averages[0][1];
-$Sum = $averages[0][1];
-$count = 1;
-$count0 = 0;
 foreach($averages as $i=>$n)
 {
 	if($i) echo ',';
 
 	$average = ($average*(100-$percent) + $n[1]*$percent) / 100;
-
-
-/*
- if ($n[1] > 0. ) {
-	$Sum += $n[1];
-	$average = $Sum/($count);
-	$count++;
- } else {
-	 $count0++;
-	 $Sum = 0;
-	 $count = 1;
-	 $average = 0;
- }
-
- */
-
 	$m = round($average, 3);
 
 	echo "[\"{$n[0]}\",$m]";
-	
 }
 
 echo '],[';

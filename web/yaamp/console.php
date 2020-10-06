@@ -3,7 +3,7 @@
 $_SERVER["HTTP_HOST"] = YAAMP_SITE_URL;
 
 // required in PHP 5.4
-date_default_timezone_set('Europe/Warsaw');
+date_default_timezone_set('Europe/Paris');
 
 return array(
 	'name'=>YAAMP_SITE_URL,
@@ -63,7 +63,7 @@ return array(
 			'keyPrefix'=>'',
 			'servers'=>array(
 				array(
-					'host'=>'memcached',
+					'host'=>'127.0.0.1',
 					'port'=> 11211,
 					'weight'=> 60,
 				),

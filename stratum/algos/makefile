@@ -4,33 +4,26 @@ CC=gcc
 #CFLAGS=-c -g -I /usr/include/mysql
 #LDFLAGS=-g
 
-CXXFLAGS = -O2 -I.. -march=native -std=c++11
-CFLAGS= $(CXXFLAGS)  -std=gnu99
+CXXFLAGS = -O2 -I.. -march=native
+CFLAGS= $(CXXFLAGS) -std=gnu99
 LDFLAGS=-O2 -lgmp
 
-SOURCES=lyra2re.c lyra2v2.c Lyra2.c lyra2z.c Lyra2-z.c Sponge.c allium.c \
-	c11.c x11.c x12.c x13.c hsr14.c sm3.c x14.c x15.c x17.c \
-	x22i.c SWIFFTX/SWIFFTX.c \
-	blake.c blakecoin.c blake2s.c jha.c keccak.c lbry.c tribus.c exosis.c \
-	deep.c fresh.c groestl.c neoscrypt.c nist5.c quark.c qubit.c skein.c skein2.c \
-	bitcore.c timetravel.c x11evo.c x16r.c x16s.c xevan.c bastion.c hmq17.c sonoa.c \
+SOURCES=lyra2re.c lyra2v2.c Lyra2.c lyra2z.c Lyra2-z.c lyra2zz.c lyra2z330.c Lyra2-zz.c Sponge.c allium.c SWIFFTX/SWIFFTX.c lyra2vc0ban.c lyra2v3.c \
+	c11.c x11.c x11k.c x12.c x13.c hsr14.c x14.c x15.c x17.c x18.c \
+	blake.c blakecoin.c blake2s.c jha.c keccak.c lbry.c tribus.c \
+	deep.c fresh.c groestl.c neoscrypt.c nist5.c quark.c qubit.c skein.c skein2.c bmw512.c \
+	bitcore.c timetravel.c x11evo.c x16r.c x16s.c x16rv2.c xevan.c bastion.c hmq17.c sonoa.c \
 	bmw.c luffa.c pentablake.c vitalium.c whirlpool.c whirlpoolx.c zr5.c \
-	scrypt.c scryptn.c sha256.c sha256t.c \
+	scrypt.c scryptn.c sha256.c sha256t.c sha256q.c \
 	yescrypt.c yescrypt-opt.c sha256_Y.c \
+	yespower.c yespower-opt.c sha256-P.c \
 	a5a.c a5amath.c m7m.c magimath.cpp velvet.c \
-	hive.c pomelo.c hex.c  \
-	phi.c phi2.c polytimos.c rainforest.c skunk.c sib.c veltor.c gost.c aergo.c lbk3.c \
-	merkletree/merkle-tree.cpp merkletree/merkle-tree.hpp \
-	merkletree/mtp.h merkletree/mtp.cpp \
-	argon2ref/argon2.c argon2ref/blake2b.c argon2ref/blake2-impl.h \
-	argon2ref/blamka-round-ref.h  argon2ref/core.h  \
-	argon2ref/encoding.h  argon2ref/thread.c  \
-	argon2ref/argon2.h  argon2ref/blake2.h    \
-	argon2ref/blamka-round-opt.h  argon2ref/core.c   \
-	argon2ref/encoding.c  argon2ref/ref.c   argon2ref/thread.h 
-
-
-OBJECTS=$(SOURCES:%.c=%.o) $(SOURCES:%.cpp=%.o)
+	argon2a.c blake2/blake2b.c blake2-ref/blake2b.c blake2-ref/blake2s.c argon2d.c ar2/argon2.c ar2/core.c ar2/encoding.c ar2/opt.c ar2/thread.c ar2/ar2-scrypt-jane.c \
+	hive.c pomelo.c hex.c geek.c balloon.c bcd.c \
+	phi.c phi2.c polytimos.c rainforest.c renesis.c skunk.c sib.c veltor.c gost.c aergo.c x22i.c x21s.c lbk3.c pipehash.c dedal.c x20r.c gltalgos.c lane.c x25x.c \
+	beenode.c honeycomb/facet_one.c honeycomb/facet_two.c honeycomb/facet_three.c honeycomb/facet_four.c honeycomb/facet_five.c honeycomb/facet_six.c honeycomb/facets_helper.c
+	
+OBJECTS=$(SOURCES:%.c=%.o) $(SOURCES:%.cpp=%.o) $(SOURCES:%.cc=%.o)
 OUTPUT=libalgos.a
 
 all: $(SOURCES) $(OUTPUT)
@@ -50,7 +43,4 @@ $(OUTPUT): $(OBJECTS)
 clean:
 	rm -f *.o
 	rm -f ar2/*.o
-	rm -f blake2/*.o
-	rm -f SWIFFTX/*.o
-	rm -f argon2ref/*.o
-	rm -f merkletree/*.o
+	rm -f blake2/*.o	

@@ -40,14 +40,6 @@ bool client_subscribe(YAAMP_CLIENT *client, json_value *json_params)
 		client->extranonce1[24] = '\0';
 		client->extranonce2size = client->extranonce2size_default = 12;
 	}
-/*
-       if (g_current_algo->name && !strcmp(g_current_algo->name,"mtp")) {
-                memset(&client->extranonce1[0], '0', sizeof(client->extranonce1));
-		memcpy(&client->extranonce1[8], client->extranonce1_default, YAAMP_EXTRANONCE2_SIZE*2);
-                client->extranonce1[16] = '\0';
-                client->extranonce2size = client->extranonce2size_default = 8;
-        }
-*/
 
 	get_random_key(client->notify_id);
 
@@ -95,7 +87,7 @@ bool client_subscribe(YAAMP_CLIENT *client, json_value *json_params)
 			client1->lock_count = 0;
 
 			if (g_debuglog_client) {
-				debuglog("reconnecting client locked to %x", client->jobid_next);
+				debuglog("reconnecting client locked to %x\n", client->jobid_next);
 			}
 		}
 
@@ -113,7 +105,7 @@ bool client_subscribe(YAAMP_CLIENT *client, json_value *json_params)
 				client1->lock_count = 0;
 
 				if (g_debuglog_client) {
-					debuglog("reconnecting2 client");
+					debuglog("reconnecting2 client\n");
 				}
 			}
 		}
@@ -123,35 +115,12 @@ bool client_subscribe(YAAMP_CLIENT *client, json_value *json_params)
 	client->extranonce2size_last = client->extranonce2size;
 
 	if (g_debuglog_client) {
-		clientlog(client,"new client with nonce %s\n", client->extranonce1);
+		debuglog("new client with nonce %s\n", client->extranonce1);
 	}
-	if (g_current_algo->name && !strcmp(g_current_algo->name, "mtp")) {
 
-		uint32_t len_notify = strlen(client->notify_id);
-		uint32_t len_xtra1 = strlen(client->extranonce1);
-		unsigned char * notify_bin = (unsigned char*)malloc(len_notify/2);
-		unsigned char * xtra1_bin = (unsigned char*)malloc(len_xtra1 / 2);
-		binlify(notify_bin,client->notify_id);
-		binlify(xtra1_bin, client->extranonce1);
-		json_value *obj = json_object_new(0);
-		json_value *arr = json_array_new(0);
-//		json_array_push(arr,json_bytes_new_nocopy(len_notify/2,notify_bin));
-//		json_array_push(arr, json_bytes_new_nocopy(len_xtra1/2,xtra1_bin));
-		json_array_push(arr,json_bytes_new(notify_bin,len_notify/2));
-		json_array_push(arr, json_bytes_new(xtra1_bin,len_xtra1/2));
-		json_object_push(obj,"id",json_integer_new(client->id_int));
-		json_object_push(obj, "result", arr);
-		json_object_push(obj,"error",json_null_new());
+	client_send_result(client, "[[[\"mining.set_difficulty\",\"%.3g\"],[\"mining.notify\",\"%s\"]],\"%s\",%d]",
+		client->difficulty_actual, client->notify_id, client->extranonce1, client->extranonce2size);
 
-        int res = socket_send_raw_mtp(client->sock,obj);
-		free(notify_bin);
-		free(xtra1_bin);
-		json_builder_free(obj);
-
-	} else {
-		client_send_result(client, "[[[\"mining.set_difficulty\",\"%.3g\"],[\"mining.notify\",\"%s\"]],\"%s\",%d]",
-			client->difficulty_actual, client->notify_id, client->extranonce1, client->extranonce2size);
-	}
 	return true;
 }
 
@@ -179,11 +148,11 @@ bool client_validate_user_address(YAAMP_CLIENT *client)
 	if (!client->coinid) {
 		for(CLI li = g_list_coind.first; li; li = li->next) {
 			YAAMP_COIND *coind = (YAAMP_COIND *)li->data;
-			// debuglog("user %s testing on coin %s ...", client->username, coind->symbol);
+			// debuglog("user %s testing on coin %s ...\n", client->username, coind->symbol);
 			if(!coind_can_mine(coind)) continue;
 			if(strlen(g_current_algo->name) && strcmp(g_current_algo->name, coind->algo)) continue;
 			if(coind_validate_user_address(coind, client->username)) {
-				debuglog("new user %s for coin %s", client->username, coind->symbol);
+				debuglog("new user %s for coin %s\n", client->username, coind->symbol);
 				client->coinid = coind->id;
 				// update the db now to prevent addresses conflicts
 				CommonLock(&g_db_mutex);
@@ -227,7 +196,6 @@ bool client_validate_user_address(YAAMP_CLIENT *client)
 bool client_authorize(YAAMP_CLIENT *client, json_value *json_params)
 {
 
-
 	if(g_list_client.Find(client)) {
 		clientlog(client, "Already logged");
 		client_send_error(client, 21, "Already logged");
@@ -268,11 +236,11 @@ bool client_authorize(YAAMP_CLIENT *client, json_value *json_params)
 
 	bool reset = client_initialize_multialgo(client);
 	if(reset) return false;
-	debuglog("*********************before initialize difficulty");
+
 	client_initialize_difficulty(client);
 
 	if (g_debuglog_client) {
-		debuglog("new client %s, %s, %s", client->username, client->password, client->version);
+		debuglog("new client %s, %s, %s\n", client->username, client->password, client->version);
 	}
 
 	if(!client->userid || !client->workerid)
@@ -305,25 +273,15 @@ bool client_authorize(YAAMP_CLIENT *client, json_value *json_params)
 
 		return false;
 	}
-	if (g_current_algo->name && !strcmp(g_current_algo->name, "mtp")) {
-		clientlog(client,"submit client true and send target");
-		client_send_result_mtp(client, "true");
-		client_send_target_mtp(client, client->difficulty_actual);
 
-	} else {
-		client_send_result(client, "true");
-		client_send_difficulty(client, client->difficulty_actual);
-	}
+	client_send_result(client, "true");
+	client_send_difficulty(client, client->difficulty_actual);
 
-
-	if(client->jobid_locked) {
-
-		clientlog(client,"job_send_jobid");
+	if(client->jobid_locked)
 		job_send_jobid(client, client->jobid_locked);
-	} else {
-		clientlog(client,"job_send_last");
+	else
 		job_send_last(client);
-	}
+
 	g_list_client.AddTail(client);
 	return true;
 }
@@ -333,7 +291,6 @@ bool client_authorize(YAAMP_CLIENT *client, json_value *json_params)
 bool client_update_block(YAAMP_CLIENT *client, json_value *json_params)
 {
 	// password, id, block hash
-	debuglog("client_update_block");
 	if(json_params->u.array.length < 3 || !json_params->u.array.values[0]->u.string.ptr)
 	{
 		clientlog(client, "update block, bad params");
@@ -354,7 +311,7 @@ bool client_update_block(YAAMP_CLIENT *client, json_value *json_params)
 	const char* hash = json_params->u.array.values[2]->u.string.ptr;
 
 	if (g_debuglog_client) {
-		debuglog("notify: new %s block %s", coind->symbol, hash);
+		debuglog("notify: new %s block %s\n", coind->symbol, hash);
 	}
 
 	snprintf(coind->lastnotifyhash, 161, "%s", hash);
@@ -401,7 +358,7 @@ static bool client_store_stats(YAAMP_CLIENT *client, json_value *result)
 
 	json_value *val = json_get_val(result, "type");
 	if (val && json_is_string(val)) {
-		debuglog("received stats of type %s", json_string_value(val));
+		debuglog("received stats of type %s\n", json_string_value(val));
 		//if (!strcmp("gpu", json_string_value(val))) {
 			CommonLock(&g_db_mutex);
 			db_store_stats(g_db, client, result);
@@ -527,7 +484,7 @@ bool client_auth_by_workers(YAAMP_CLIENT *client)
 //
 //void source_prune()
 //{
-////	debuglog("source_prune() %d", g_list_source.count);
+////	debuglog("source_prune() %d\n", g_list_source.count);
 //	g_list_source.Enter();
 //	for(CLI li = g_list_source.first; li; li = li->next)
 //	{
@@ -576,116 +533,60 @@ void *client_thread(void *p)
 	client->sock = socket_initialize((int)(long)p);
 //	client->source = source_init(client);
 
- 	client->shares_per_minute = YAAMP_SHAREPERSEC;
+	client->shares_per_minute = YAAMP_SHAREPERSEC;
 	client->last_submit_time = current_timestamp();
-/*
-we need to check here if standard json or bos-json is used here
-
-
-*/
-
-
 
 //	usleep(g_list_client.count * 5000);
 
 	while(!g_exiting)
 	{
-
-int64_t acc_plus_reject = client->submit_bad+client->shares;
-double acc_to_reject = (acc_plus_reject==0)?  (double)0.0 :  (double)((double)(client->submit_bad)/(double)(acc_plus_reject));
-			clientlog(client, "bad submits accepted = %d rejected = %d ratio = %f consecutive bad = %d", client->shares, client->submit_bad,acc_to_reject,client->delta_bad);
-		if(/*acc_to_reject>0.05 || */ client->delta_bad>2)
-//		if (acc_to_reject>0.3 && acc_plus_reject > 50)  // disconnect miner if it gets more than 30% reject after 50 submit. miner should reconnect without problem
+		if(client->submit_bad > 1024)
 		{
-			clientlog(client, "Too many reject, exiting:  accepted = %d rejected = %d ratio = %f consecutive bad = %d", client->shares, client->submit_bad,acc_to_reject,client->delta_bad);
+			clientlog(client, "bad submits");
 			break;
 		}
 
-//	json_error_t *boserror = (json_error_t *)malloc(sizeof(json_error_t));
-//mtp or not
-		
-//		json_value *json = (strstr(g_current_algo->name,"mtp"))? bos_deserialize(socket_nextjson_bos3(client->sock, client),boserror) : socket_nextjson(client->sock, client);
-		json_value *json = (strstr(g_current_algo->name,"mtp"))? socket_nextjson_bos(client->sock, client) : socket_nextjson(client->sock, client);
-/*		
-if (strstr(g_current_algo->name,"mtp")) {
-	free(boserror);
-	if (bos_sizeof(client->sock->buffer) < client->sock->buflen_bos)
-	{
-
-		uint32_t totsize = client->sock->buflen_bos;
-		uint32_t remsize = client->sock->buflen_bos - bos_sizeof(client->sock->buffer);
-		uint32_t currsize = bos_sizeof(client->sock->buffer);
-		memmove(client->sock->buffer, client->sock->buffer + currsize, remsize);
-		client->sock->buflen_bos = remsize;
-
-	   debuglog("buflen bigger than bos_sizeof after decrement = %d",remsize);
-
-		//		if(client && client->logtraffic)
-		//			stratumlog("still: %s\n", s->buffer);
-	}
-	else
-	{
-		debuglog("empty buffer");
-		memset(client->sock->buffer, 0, YAAMP_SOCKET_BUFSIZE);
-		client->sock->buffer[0] = '\0';
-		client->sock->buflen_bos = 0;
-	}
-}
-
-
-		json_value *json = json_object_new(0);
-
-		if ((strstr(g_current_algo->name,"mtp")))
-			socket_nextjson_bos2((json_value*)json,client->sock, client);
-		else 
-			socket_nextjson2((json_value*)json,client->sock, client);
-*/
+		json_value *json = socket_nextjson(client->sock, client);
 		if(!json)
 		{
-			clientlog(client, "client.cpp bad json");
+//			clientlog(client, "bad json");
 			break;
 		}
 
 		client->id_int = json_get_int(json, "id");
-
 		client->id_str = json_get_string(json, "id");
-
-
 		if (client->id_str && strlen(client->id_str) > 32) {
 			clientlog(client, "bad id");
-			json_builder_free(json);
 			break;
 		}
 
 		const char *method = json_get_string(json, "method");
-		debuglog("the method = %s",method);
+
 		if (!method && client->stats && client->id_int == client->reqid)
 		{
 			json_value *result = json_get_object(json, "result");
 			if (result) client_store_stats(client, result);
-			json_builder_free(json);
+			json_value_free(json);
 			continue;
 		}
 
 		if(!method)
 		{
-			json_builder_free(json);
+			json_value_free(json);
 			clientlog(client, "bad json, no method");
 			break;
 		}
 
 		json_value *json_params = json_get_array(json, "params");
-
 		if(!json_params)
 		{
-//			json_value_free(json);
-			json_builder_free(json);
+			json_value_free(json);
 			clientlog(client, "bad json, no params");
 			break;
 		}
 
 		if (g_debuglog_client) {
-			debuglog("client %s %d %s", method, client->id_int, client->id_str? client->id_str: "null");
+			debuglog("client %s %d %s\n", method, client->id_int, client->id_str? client->id_str: "null");
 		}
 
 		bool b = false;
@@ -730,19 +631,18 @@ if (strstr(g_current_algo->name,"mtp")) {
 		{
 			b = client_send_error(client, 20, "Not supported");
 			client->submit_bad++;
-			client->delta_bad++;
 
 			stratumlog("unknown method %s %s\n", method, client->sock->ip);
 		}
 
-		json_builder_free(json); 
+		json_value_free(json);
 		if(!b) break;
 	}
 
 //	source_close(client->source);
 
 	if (g_debuglog_client) {
-		debuglog("client terminate");
+		debuglog("client terminate\n");
 	}
 	if(!client) {
 		pthread_exit(NULL);

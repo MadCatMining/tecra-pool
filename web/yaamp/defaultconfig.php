@@ -11,6 +11,8 @@ if (!defined('YAAMP_DBNAME')) define('YAAMP_DBNAME', 'yaamp');
 if (!defined('YAAMP_DBUSER')) define('YAAMP_DBUSER', 'root');
 if (!defined('YAAMP_DBPASSWORD')) define('YAAMP_DBPASSWORD', '');
 
+if (!defined('YIIMP_MYSQLDUMP_PATH')) define('YIIMP_MYSQLDUMP_PATH', '/root/backup');
+
 if (!defined('YIIMP_PUBLIC_EXPLORER')) define('YIIMP_PUBLIC_EXPLORER', true);
 if (!defined('YIIMP_PUBLIC_BENCHMARK')) define('YIIMP_PUBLIC_BENCHMARK', false);
 if (!defined('YIIMP_FIAT_ALTERNATIVE')) define('YIIMP_FIAT_ALTERNATIVE', 'EUR');
@@ -20,7 +22,7 @@ if (!defined('YAAMP_FEES_MINING')) define('YAAMP_FEES_MINING', 0.5);
 if (!defined('YAAMP_FEES_EXCHANGE')) define('YAAMP_FEES_EXCHANGE', 2);
 if (!defined('YAAMP_FEES_RENTING')) define('YAAMP_FEES_RENTING', 2);
 if (!defined('YAAMP_TXFEE_RENTING_WD')) define('YAAMP_TXFEE_RENTING_WD', 0.002);
-if (!defined('YAAMP_PAYMENTS_FREQ')) define('YAAMP_PAYMENTS_FREQ', 1*60*60);
+if (!defined('YAAMP_PAYMENTS_FREQ')) define('YAAMP_PAYMENTS_FREQ', 24*60*60);
 if (!defined('YAAMP_PAYMENTS_MINI')) define('YAAMP_PAYMENTS_MINI', 0.001);
 
 if (!defined('YAAMP_ALLOW_EXCHANGE')) define('YAAMP_ALLOW_EXCHANGE', false);
@@ -31,7 +33,6 @@ if (!defined('EXCH_BITTREX_KEY')) define('EXCH_BITTREX_KEY', '');
 if (!defined('EXCH_BITSTAMP_ID')) define('EXCH_BITSTAMP_ID', '');
 if (!defined('EXCH_BITSTAMP_KEY')) define('EXCH_BITSTAMP_KEY','');
 if (!defined('EXCH_BLEUTRADE_KEY')) define('EXCH_BLEUTRADE_KEY', '');
-if (!defined('EXCH_BTER_KEY')) define('EXCH_BTER_KEY', '');
 if (!defined('EXCH_CCEX_KEY')) define('EXCH_CCEX_KEY', '');
 if (!defined('EXCH_CEXIO_ID')) define('EXCH_CEXIO_ID', '');
 if (!defined('EXCH_CEXIO_KEY')) define('EXCH_CEXIO_KEY', '');
@@ -42,6 +43,7 @@ if (!defined('EXCH_POLONIEX_KEY')) define('EXCH_POLONIEX_KEY', '');
 if (!defined('EXCH_YOBIT_KEY')) define('EXCH_YOBIT_KEY', '');
 if (!defined('EXCH_KRAKEN_KEY')) define('EXCH_KRAKEN_KEY', '');
 if (!defined('EXCH_KUCOIN_KEY')) define('EXCH_KUCOIN_KEY', '');
+if (!defined('EXCH_KUCOIN_PASSPHRASE')) define('EXCH_KUCOIN_PASSPHRASE', '');
 if (!defined('EXCH_LIVECOIN_KEY')) define('EXCH_LIVECOIN_KEY', '');
 if (!defined('EXCH_NOVA_KEY')) define('EXCH_NOVA_KEY', '');
 if (!defined('EXCH_STOCKSEXCHANGE_KEY')) define('EXCH_STOCKSEXCHANGE_KEY', '');

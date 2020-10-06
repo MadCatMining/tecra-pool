@@ -72,20 +72,6 @@ int client_send_error(YAAMP_CLIENT *client, int error, const char *string)
 	return socket_send(client->sock, "{\"id\":%s,\"result\":false,\"error\":[%d,\"%s\",null]}\n", buffer3, error, string);
 }
 
-int client_send_error_mtp(YAAMP_CLIENT *client, int error, const char *string)
-{
-	char buffer3[1024];
-
-	if (client->id_str)
-		sprintf(buffer3, "\"%s\"", client->id_str);
-	else
-		sprintf(buffer3, "%d", client->id_int);
-
-	return socket_send_mtp(client->sock, "{\"id\":%s,\"result\":false,\"error\":[%d,\"%s\",null]}\n", buffer3, error, string);
-}
-
-
-
 int client_send_result(YAAMP_CLIENT *client, const char *format, ...)
 {
 	char buffer[YAAMP_SMALLBUFSIZE];
@@ -105,28 +91,6 @@ int client_send_result(YAAMP_CLIENT *client, const char *format, ...)
 	return socket_send(client->sock, "{\"id\":%s,\"result\":%s,\"error\":null}\n", buffer3, buffer);
 }
 
-int client_send_result_mtp(YAAMP_CLIENT *client, const char *format, ...)
-{
-	char buffer[YAAMP_SMALLBUFSIZE];
-	va_list args;
-
-	va_start(args, format);
-	vsprintf(buffer, format, args);
-	va_end(args);
-
-
-	char buffer3[1024];
-
-	if (client->id_str)
-		sprintf(buffer3, "\"%s\"", client->id_str);
-	else
-		sprintf(buffer3, "%d", client->id_int);
-
-        clientlog(client," {\"id\":%s,\"result\":%s,\"error\":null}; jobid = %d\n", buffer3, buffer,client->jobid_sent);
-	return socket_send_mtp(client->sock, "{\"id\":%s,\"result\":%s,\"error\":null}\n", buffer3, buffer);
-}
-
-
 int client_call(YAAMP_CLIENT *client, const char *method, const char *format, ...)
 {
 	char buffer[YAAMP_SMALLBUFSIZE];
@@ -137,18 +101,6 @@ int client_call(YAAMP_CLIENT *client, const char *method, const char *format, ..
 	va_end(args);
 
 	return socket_send(client->sock, "{\"id\":null,\"method\":\"%s\",\"params\":%s}\n", method, buffer);
-}
-
-int client_call_mtp(YAAMP_CLIENT *client, const char *method, const char *format, ...)
-{
-	char buffer[YAAMP_SMALLBUFSIZE];
-	va_list args;
-
-	va_start(args, format);
-	vsprintf(buffer, format, args);
-	va_end(args);
-	clientlog(client,"client_call method = %s params = %s \n",method,buffer);
-	return socket_send_mtp(client->sock, "{\"id\":null,\"method\":\"%s\",\"params\":%s}\n", method, buffer);
 }
 
 int client_ask(YAAMP_CLIENT *client, const char *method, const char *format, ...)
@@ -163,32 +115,12 @@ int client_ask(YAAMP_CLIENT *client, const char *method, const char *format, ...
 
 	int ret = socket_send(client->sock, "{\"id\":%d,\"method\":\"%s\",\"params\":%s}\n", id, method, buffer);
 	if (ret == -1) {
-		debuglog("unable to ask %s", method);
+		debuglog("unable to ask %s\n", method);
 		return 0; // -errno
 	}
 	client->reqid = id;
 	return id;
 }
-
-int client_ask_mtp(YAAMP_CLIENT *client, const char *method, const char *format, ...)
-{
-	char buffer[YAAMP_SMALLBUFSIZE];
-	va_list args;
-	int64_t id = client->shares;
-
-	va_start(args, format);
-	vsprintf(buffer, format, args);
-	va_end(args);
-
-	int ret = socket_send_mtp(client->sock, "{\"id\":%d,\"method\":\"%s\",\"params\":%s}\n", id, method, buffer);
-	if (ret == -1) {
-		debuglog("unable to ask %s", method);
-		return 0; // -errno
-	}
-	client->reqid = id;
-	return id;
-}
-
 
 void client_block_ip(YAAMP_CLIENT *client, const char *reason)
 {
@@ -218,7 +150,7 @@ bool client_reset_multialgo(YAAMP_CLIENT *client, bool first)
 {
 //	return false;
 	if(!client->algos_subscribed[0].algo) return false;
-//	debuglog("client_reset_multialgo");
+//	debuglog("client_reset_multialgo\n");
 
 	YAAMP_CLIENT_ALGO *best = NULL;
 	YAAMP_CLIENT_ALGO *current = NULL;
@@ -252,9 +184,9 @@ bool client_reset_multialgo(YAAMP_CLIENT *client, bool first)
 		double d = best->algo->profit*best->factor - current->algo->profit*current->factor;
 		double p = d/best->algo->profit/best->factor;
 #ifdef DEBUG_BEST_MULTI
-		debuglog("current %s %f", current->algo->name, current->algo->profit*current->factor);
-		debuglog("best    %s %f", best->algo->name, best->algo->profit*best->factor);
-		debuglog(" %d * %f = %f --- percent %f %f", e, d, e*d, p, e*p);
+		debuglog("current %s %f\n", current->algo->name, current->algo->profit*current->factor);
+		debuglog("best    %s %f\n", best->algo->name, best->algo->profit*best->factor);
+		debuglog(" %d * %f = %f --- percent %f %f\n", e, d, e*d, p, e*p);
 #endif
 		if(p < 0.02) return false;
 		if(e*p < 100) return false;
@@ -317,14 +249,14 @@ void client_add_job_history(YAAMP_CLIENT *client, int jobid)
 {
 	if(!jobid)
 	{
-		debuglog("trying to add jobid 0");
+		debuglog("trying to add jobid 0\n");
 		return;
 	}
 
 	bool b = client_find_job_history(client, jobid, 0);
 	if(b)
 	{
-//		debuglog("ERROR history already added job %x", jobid);
+//		debuglog("ERROR history already added job %x\n", jobid);
 		return;
 	}
 
@@ -341,7 +273,7 @@ bool client_find_job_history(YAAMP_CLIENT *client, int jobid, int startat)
 		if(client->job_history[i] == jobid)
 		{
 //			if(!startat)
-//				debuglog("job %x already sent, index %d", jobid, i);
+//				debuglog("job %x already sent, index %d\n", jobid, i);
 
 			return true;
 		}
@@ -400,7 +332,7 @@ bool client_find_my_ip(const char *name)
 
 		if(!strcmp(host, ip))
 		{
-			debuglog("found my ip %s", ip);
+			debuglog("found my ip %s\n", ip);
 			return true;
 		}
 	}

@@ -295,7 +295,7 @@ static json_value *curl_json_rpc(YAAMP_RPC *rpc, const char *url, const char *rp
 		long errcode = 0;
 		CURLcode c = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &errcode);
 		if (c == CURLE_OK && errcode == 401) {
-			debuglog("ERR: You are not authorized, check your login and password.");
+			debuglog("ERR: You are not authorized, check your login and password.\n");
 			goto err_out;
 		}
 	}
@@ -303,14 +303,14 @@ static json_value *curl_json_rpc(YAAMP_RPC *rpc, const char *url, const char *rp
 	val = json_parse(httpdata, strlen(httpdata));
 	if (!val) {
 		snprintf(curl_last_err, last_err_len, "JSON decode failed!");
-		debuglog("ERR: JSON decode failed!");
+		debuglog("ERR: JSON decode failed!\n");
 		if (opt_protocol)
-			debuglog("%s", httpdata);
+			debuglog("%s\n", httpdata);
 		goto err_out;
 	}
 
 	if (opt_protocol) {
-		debuglog("JSON protocol response:\n%s", httpdata);
+		debuglog("JSON protocol response:\n%s\n", httpdata);
 	}
 
 	databuf_free(&all_data);
@@ -346,7 +346,7 @@ bool rpc_curl_connected(YAAMP_RPC *rpc)
 				struct sockaddr_in6 *s = (struct sockaddr_in6*) &peer;
 				port = (int) ntohs(s->sin6_port);
 			}
-			//debuglog("%s port %d", __func__, port);
+			//debuglog("%s port %d\n", __func__, port);
 			return (port > 0);
 		}
 	}
@@ -357,7 +357,7 @@ bool rpc_curl_connected(YAAMP_RPC *rpc)
 void rpc_curl_close(YAAMP_RPC *rpc)
 {
 	if(!rpc->CURL) return;
-//	debuglog("%s %d", __func__, (int) rpc->sock);
+//	debuglog("%s %d\n", __func__, (int) rpc->sock);
 
 	curl_easy_cleanup(rpc->CURL);
 	rpc->CURL = NULL;
@@ -368,7 +368,7 @@ bool rpc_curl_connect(YAAMP_RPC *rpc)
 	//rpc_curl_close(rpc);
 
 	if (!rpc->CURL) {
-//		debuglog("%s %d", __func__, (int) rpc->sock);
+//		debuglog("%s %d\n", __func__, (int) rpc->sock);
 		rpc->CURL = curl_easy_init();
 	}
 
@@ -400,7 +400,7 @@ static json_value *rpc_curl_do_call(YAAMP_RPC *rpc, char const *data)
 
 json_value *rpc_curl_call(YAAMP_RPC *rpc, char const *method, char const *params)
 {
-//	debuglog("%s: %s:%d %s", __func__, rpc->host, rpc->port, method);
+//	debuglog("%s: %s:%d %s\n", __func__, rpc->host, rpc->port, method);
 
 	int s1 = current_timestamp();
 	if (!rpc->CURL) {
@@ -427,7 +427,7 @@ json_value *rpc_curl_call(YAAMP_RPC *rpc, char const *method, char const *params
 
 	int s2 = current_timestamp();
 	if(s2-s1 > 2000)
-		debuglog("%s: delay %s:%d %s in %d ms", __func__, rpc->host, rpc->port, method, s2-s1);
+		debuglog("%s: delay %s:%d %s in %d ms\n", __func__, rpc->host, rpc->port, method, s2-s1);
 
 	if(json->type != json_object)
 	{

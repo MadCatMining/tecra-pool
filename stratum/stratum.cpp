@@ -33,14 +33,6 @@ double g_stratum_difficulty;
 double g_stratum_min_diff;
 double g_stratum_max_diff;
 
-// var diff adjust 
-int g_stratum_vardiff_retargettime;
-int g_stratum_vardiff_targettime;
-double g_stratum_vardiff_varplus;
-double g_stratum_vardiff_varmin;
-// job update time
-int g_stratum_jobupdate;
-
 int g_stratum_max_ttf;
 int g_stratum_max_cons = 5000;
 bool g_stratum_reconnect;
@@ -119,27 +111,36 @@ static void neoscrypt_hash(const char* input, char* output, uint32_t len)
 YAAMP_ALGO g_algos[] =
 {
 	{"sha256", sha256_double_hash, 1, 0, 0},
+	{"sha256t", sha256_double_hash, 1, 0, 0},
+	{"sha256q", sha256_double_hash, 1, 0, 0},
 	{"scrypt", scrypt_hash, 0x10000, 0, 0},
 	{"scryptn", scryptn_hash, 0x10000, 0, 0},
 	{"neoscrypt", neoscrypt_hash, 0x10000, 0, 0},
 
 	{"c11", c11_hash, 1, 0, 0},
 	{"x11", x11_hash, 1, 0, 0},
+    {"x11k", x11k_hash, 1, 0, 0},
 	{"x12", x12_hash, 1, 0, 0},
 	{"x13", x13_hash, 1, 0, 0},
 	{"x14", x14_hash, 1, 0, 0},
 	{"x15", x15_hash, 1, 0, 0},
 	{"x17", x17_hash, 1, 0, 0},
+	{"x18", x18_hash, 1, 0, 0},
+	{"x20r", x20r_hash, 0x100, 0, 0},
+	{"x21s", x21s_hash, 0x100, 0, 0},
 	{"x22i", x22i_hash, 1, 0, 0},
-
+	{"x25x", x25x_hash, 1, 0, 0},
+	
+	{"bcd", bcd_hash, 1, 0, 0},
+	
 	{"x11evo", x11evo_hash, 1, 0, 0},
 	{"xevan", xevan_hash, 0x100, 0, 0},
 
 	{"x16r", x16r_hash, 0x100, 0, 0},
 	{"x16s", x16s_hash, 0x100, 0, 0},
+	{"x16rv2", x16rv2_hash, 0x100, 0, 0},
 	{"timetravel", timetravel_hash, 0x100, 0, 0},
 	{"bitcore", timetravel10_hash, 0x100, 0, 0},
-	{"exosis", exosis_hash, 0x100, 0, 0},
 	{"hsr", hsr_hash, 1, 0, 0},
 	{"hmq1725", hmq17_hash, 0x10000, 0, 0},
 
@@ -148,8 +149,12 @@ YAAMP_ALGO g_algos[] =
 	{"allium", allium_hash, 0x100, 0, 0},
 	{"lyra2", lyra2re_hash, 0x80, 0, 0},
 	{"lyra2v2", lyra2v2_hash, 0x100, 0, 0},
+	{"lyra2v3", lyra2v3_hash, 0x100, 0, 0},
 	{"lyra2z", lyra2z_hash, 0x100, 0, 0},
-
+	{"lyra2zz", lyra2zz_hash, 0x100, 0, 0},
+	{"lyra2z330", lyra2z330_hash, 0x100, 0, 0},
+	{"lyra2vc0ban", lyra2vc0ban_hash, 0x100, 0, 0},
+	
 	{"bastion", bastion_hash, 1, 0 },
 	{"blake", blake_hash, 1, 0 },
 	{"blakecoin", blakecoin_hash, 1 /*0x100*/, 0, sha256_hash_hex },
@@ -158,6 +163,7 @@ YAAMP_ALGO g_algos[] =
 	{"decred", decred_hash, 1, 0 },
 
 	{"deep", deep_hash, 1, 0, 0},
+	{"dedal", dedal_hash, 0x100, 0, 0},
 	{"fresh", fresh_hash, 0x100, 0, 0},
 	{"quark", quark_hash, 1, 0, 0},
 	{"nist5", nist5_hash, 1, 0, 0},
@@ -179,25 +185,47 @@ YAAMP_ALGO g_algos[] =
 	{"skunk", skunk_hash, 1, 0, 0},
 
 	{"bmw", bmw_hash, 1, 0, 0},
+	{"bmw512", bmw512_hash, 0x100, 0, 0},
 	{"lbk3", lbk3_hash, 0x100, 0, 0},
 	{"lbry", lbry_hash, 0x100, 0, 0},
 	{"luffa", luffa_hash, 1, 0, 0},
 	{"penta", penta_hash, 1, 0, 0},
 	{"rainforest", rainforest_hash, 0x100, 0, 0},
 	{"skein2", skein2_hash, 1, 0, 0},
+	
 	{"yescrypt", yescrypt_hash, 0x10000, 0, 0},
-	{"yescryptR16", yescryptR16_hash, 0x10000, 0, 0 },
-	{"yescryptR32", yescryptR32_hash, 0x10000, 0, 0 },
+	{"yescryptR8", yescryptR8_hash, 0x10000, 0, 0},
+	{"yescryptR16", yescryptR16_hash, 0x10000, 0, 0},
+	{"yescryptR32", yescryptR32_hash, 0x10000, 0, 0},
+	
+	{"yespower", yespower_hash, 0x10000, 0, 0},
+	{"yespowerR8", yespower_0_5_R8_hash, 0x10000, 0, 0},
+	{"yespowerR16", yespower_0_5_R16_hash, 0x10000, 0, 0},
+	{"yespowerR24", yespower_0_5_R24_hash, 0x10000, 0, 0},
+	{"yespowerR32", yespower_0_5_R32_hash, 0x10000, 0, 0},
+	{"yespower_ltncg", yespower_ltncg_hash, 0x10000, 0, 0},
+	{"cpupower", cpupower_hash, 0x10000, 0, 0},
+	
+	
 	{"zr5", zr5_hash, 1, 0, 0},
-
+	{"renesis", renesis_hash, 1, 0, 0},
+	{"geek", geek_hash, 1, 0, 0},
 	{"a5a", a5a_hash, 0x10000, 0, 0},
 	{"hive", hive_hash, 0x10000, 0, 0},
 	{"m7m", m7m_hash, 0x10000, 0, 0},
 	{"veltor", veltor_hash, 1, 0, 0},
 	{"velvet", velvet_hash, 0x10000, 0, 0},
+	{"argon2", argon2a_hash, 0x10000, 0, sha256_hash_hex },
+	{"argon2d-crds", argon2d_crds_hash, 0x10000, 0, 0 }, // Credits Argon2d Implementation
+	{"argon2d-dyn", argon2d_dyn_hash, 0x10000, 0, 0 }, // Dynamic Argon2d Implementation
+	{"argon2d-uis", argon2d_uis_hash, 0x10000, 0, 0 }, // Argon2d Implementation
 	{"vitalium", vitalium_hash, 1, 0, 0},
 	{"aergo", aergo_hash, 1, 0, 0},
 
+	{"balloon", balloon_hash, 1, 0, 0},
+
+	{"pipe", pipe_hash, 1,0,0},
+	
 	{"sha256t", sha256t_hash, 1, 0, 0}, // sha256 3x
 
 	{"sib", sib_hash, 1, 0, 0},
@@ -205,7 +233,14 @@ YAAMP_ALGO g_algos[] =
 	{"whirlcoin", whirlpool_hash, 1, 0, sha256_hash_hex }, /* old sha merkleroot */
 	{"whirlpool", whirlpool_hash, 1, 0 }, /* sha256d merkleroot */
 	{"whirlpoolx", whirlpoolx_hash, 1, 0, 0},
-	{"mtp",        0,      1, 0, 0,mtp_verify}, /* mtp algo */
+	
+	{"astralhash", astralhash_hash, 0x100, 0, 0},
+	
+	{"jeonghash", jeonghash_hash, 0x100, 0, 0},
+	
+	{"pawelhash", pawelhash_hash, 0x100, 0, 0},
+	
+	{"honeycomb", beenode_hash, 0x10000, 0, 0},
 
 	{"", NULL, 0, 0},
 };
@@ -225,16 +260,11 @@ YAAMP_ALGO *stratum_find_algo(const char *name)
 
 int main(int argc, char **argv)
 {
-
-	srand (time(NULL)); // initialize random number for later use
-
 	if(argc < 2)
 	{
-		debuglog("usage: %s <algo>", argv[0]);
+		printf("usage: %s <algo>\n", argv[0]);
 		return 1;
 	}
-
-	debuglog("------ new session --------");
 
 	srand(time(NULL));
 	getifaddrs(&g_ifaddr);
@@ -246,25 +276,13 @@ int main(int argc, char **argv)
 	g_autoexchange = false;
 #endif
 
-//    std::string argv_str(argv[0]);
-//    std::string base = argv_str.substr(0, argv_str.find_last_of("/"));
 	char configfile[1024];
-	const char *config_path = "config";
-	const char *ext = ".conf";
-	// maybe add or maybe not the '.conf'
-	if(strlen(argv[1]) > strlen(ext) && strcmp(ext, &argv[1][strlen(argv[1])-strlen(ext)]) == 0){
-	    debuglog("Loading %s", argv[1]);
-	    sprintf(configfile, "%s/%s",config_path, argv[1]);
-	} else {
-	    debuglog("Loading %s%s", argv[1], ext);
-	    sprintf(configfile, "%s/%s%s",config_path, argv[1], ext);
-	}
+	sprintf(configfile, "%s.conf", argv[1]);
 
 	dictionary *ini = iniparser_load(configfile);
 	if(!ini)
 	{
-	    // argv[0] may not always represent our true current working directory
-		debuglog("Cannot load config file '%s', was looking in %s/%s", configfile, argv[0],config_path);
+		debuglog("cant load config file %s\n", configfile);
 		return 1;
 	}
 
@@ -285,20 +303,9 @@ int main(int argc, char **argv)
 	strcpy(g_stratum_coin_exclude, coin_filter ? coin_filter : "");
 
 	strcpy(g_stratum_algo, iniparser_getstring(ini, "STRATUM:algo", NULL));
-	g_stratum_difficulty = iniparser_getdouble(ini, "STRATUM:difficulty", 0.064);
+	g_stratum_difficulty = iniparser_getdouble(ini, "STRATUM:difficulty", 16);
 	g_stratum_min_diff = iniparser_getdouble(ini, "STRATUM:diff_min", g_stratum_difficulty/2);
 	g_stratum_max_diff = iniparser_getdouble(ini, "STRATUM:diff_max", g_stratum_difficulty*8192);
-////// variable to adjust block update and vardiff
-	g_stratum_vardiff_retargettime = iniparser_getint(ini, "STRATUM:retarget_time", YAAMP_RETARGETTIME);
-	g_stratum_vardiff_targettime = iniparser_getint(ini, "STRATUM:target_time", YAAMP_TARGETTIME);
-	g_stratum_vardiff_varplus = iniparser_getdouble(ini, "STRATUM:variance_sup", 0.3); // default 30% upper variance
-	g_stratum_vardiff_varmin = iniparser_getdouble(ini, "STRATUM:variance_min", 0.4); // default 40% lower variance
-
-// job update time
-	g_stratum_jobupdate = iniparser_getint(ini, "STRATUM:jobupdate_time", 90); //default 90sec
-
-
-
 
 	g_stratum_max_cons = iniparser_getint(ini, "STRATUM:max_cons", 5000);
 	g_stratum_max_ttf = iniparser_getint(ini, "STRATUM:max_ttf", 0x70000000);
@@ -322,7 +329,7 @@ int main(int argc, char **argv)
 	g_current_algo = stratum_find_algo(g_stratum_algo);
 
 	if(!g_current_algo) yaamp_error("invalid algo");
-	if(!g_current_algo->hash_function && !g_current_algo->mtp_function) yaamp_error("no hash function");
+	if(!g_current_algo->hash_function) yaamp_error("no hash function");
 
 //	struct rlimit rlim_files = {0x10000, 0x10000};
 //	setrlimit(RLIMIT_NOFILE, &rlim_files);
@@ -353,13 +360,9 @@ int main(int argc, char **argv)
 	YAAMP_DB *db = db_connect();
 	if(!db) yaamp_error("Cant connect database");
 
-	db_clear_workerdb(db);
 	db_register_stratum(db);
 	db_update_algos(db);
-	if (!db_update_coinds(db)) {
-		debuglog("can't find coin database exiting... ");
-		return 0;
-	};
+	db_update_coinds(db);
 
 	sleep(2);
 	job_init();
@@ -381,12 +384,7 @@ int main(int argc, char **argv)
 		db_register_stratum(db);
 		db_update_workers(db);
 		db_update_algos(db);
-//		db_update_coinds(db);
-	if (!db_update_coinds(db)) {
-		debuglog("can't find coin database exiting... ");
-		return 0;
-	};
-		job_signal();
+		db_update_coinds(db);
 
 		if(g_stratum_renting)
 		{
@@ -400,12 +398,12 @@ int main(int argc, char **argv)
 		block_prune(db);
 		submit_prune(db);
 
-		sleep(2);
-
+		sleep(1);
+		job_signal();
 
 		////////////////////////////////////
 
-
+//		source_prune();
 
 		object_prune(&g_list_coind, coind_delete);
 		object_prune(&g_list_remote, remote_delete);
@@ -416,7 +414,7 @@ int main(int argc, char **argv)
 		object_prune(&g_list_share, share_delete);
 		object_prune(&g_list_submit, submit_delete);
 
-		if (!g_exiting) sleep(g_stratum_jobupdate);
+		if (!g_exiting) sleep(20);
 	}
 
 	stratumlog("closing database...\n");
@@ -434,31 +432,29 @@ int main(int argc, char **argv)
 
 void *monitor_thread(void *p)
 {
+	int cacheHeight = 0;
 	while(!g_exiting)
 	{
-		sleep(120);
+		sleep(0.2);
 
-		if(g_last_broadcasted + YAAMP_MAXJOBDELAY < time(NULL))
+		g_list_coind.Enter();
+		for(CLI li = g_list_coind.first; li; li = li->next)
 		{
-			g_exiting = true;
-			stratumlogdate("%s dead lock, exiting...\n", g_stratum_algo);
-			exit(1);
-		}
+			YAAMP_COIND *coind = (YAAMP_COIND *)li->data;
+			json_value *json = rpc_call(&coind->rpc, "getblockcount");
+			if (!json) continue;
+			json_int_t amount = json_get_int(json, "result");
 
-		if(g_max_shares && g_shares_counter) {
-
-			if((g_shares_counter - g_shares_log) > 10000) {
-				stratumlogdate("%s %luK shares...\n", g_stratum_algo, (g_shares_counter/1000u));
-				g_shares_log = g_shares_counter;
-			}
-
-			if(g_shares_counter > g_max_shares) {
-				g_exiting = true;
-				
-				stratumlogdate("%s need a restart (%lu shares), exiting...\n", g_stratum_algo, (unsigned long) g_max_shares);
-				exit(1);
+			if (coind->height != amount) {
+                                if (coind->height != cacheHeight) {
+				      debuglog("coind->height differs from rpc response, forcing new template (%d vs %d)..\n", coind->height, amount);
+                                      cacheHeight = coind->height;
+                                }
+				coind_create_job(coind, true);
+				job_update();
 			}
 		}
+		g_list_coind.Leave();
 	}
 }
 
@@ -483,12 +479,9 @@ void *stratum_thread(void *p)
 
 	res = listen(listen_sock, 4096);
 	if(res < 0) yaamp_error("listen");
-  	int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
-	debuglog("number of thread = %",num_cores);
+
 	/////////////////////////////////////////////////////////////////////////
-		cpu_set_t cpuset;
-		pthread_attr_t attr;	
-		pthread_attr_init(&attr);
+
 	int failcount = 0;
 	while(!g_exiting)
 	{
@@ -508,17 +501,8 @@ void *stratum_thread(void *p)
 		}
 
 		failcount = 0;
-/// distributes client share over all the cpu cores instead of having them all on running on a same core
-/// distribution is done by a uniform random generator. 
 		pthread_t thread;
-		int random_core = rand()%num_cores;
-		debuglog("random core = %d",random_core);
-		CPU_ZERO(&cpuset);
-		CPU_SET(random_core,&cpuset);
-		
-		int s = pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpuset);
-		int res = pthread_create(&thread, &attr, client_thread, (void *)(long)sock);
-//		int res = pthread_create(&thread, NULL, client_thread, (void *)(long)sock);
+		int res = pthread_create(&thread, NULL, client_thread, (void *)(long)sock);
 		if(res != 0)
 		{
 			int error = errno;

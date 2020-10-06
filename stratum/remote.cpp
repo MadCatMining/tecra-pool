@@ -39,7 +39,7 @@ bool remote_connected(YAAMP_REMOTE *remote)
 void remote_close(YAAMP_REMOTE *remote)
 {
 	if (g_debuglog_remote) {
-		debuglog("remote_close JOB%d", remote->id);
+		debuglog("remote_close JOB%d\n", remote->id);
 	}
 
 	remote->difficulty_actual = 0;
@@ -64,7 +64,7 @@ bool remote_connect(YAAMP_REMOTE *remote)
 		remote_close(remote);
 
 	if (g_debuglog_remote) {
-		debuglog("connecting to %s:%d JOB%d", remote->host, remote->port, remote->id);
+		debuglog("connecting to %s:%d JOB%d\n", remote->host, remote->port, remote->id);
 	}
 
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -84,7 +84,7 @@ bool remote_connect(YAAMP_REMOTE *remote)
 	if(res < 0)
 	{
 		if (g_debuglog_remote) {
-			debuglog("cant connect to %s:%d JOB%d", remote->host, remote->port, remote->id);
+			debuglog("cant connect to %s:%d JOB%d\n", remote->host, remote->port, remote->id);
 		}
 		return false;
 	}
@@ -96,7 +96,7 @@ bool remote_connect(YAAMP_REMOTE *remote)
 	remote->sock = socket_initialize(sock);
 //	remote->updated = time(NULL);
 
-    debuglog("connected to %s:%d JOB%d", remote->host, remote->port, remote->id);
+    debuglog("connected to %s:%d JOB%d\n", remote->host, remote->port, remote->id);
     return true;
 }
 
@@ -114,7 +114,7 @@ void *remote_thread(void *p)
 	{
 		if(!remote_connected(remote))
 		{
-			debuglog("disconnected from %s:%d JOB%d", remote->host, remote->port, remote->id);
+			debuglog("disconnected from %s:%d JOB%d\n", remote->host, remote->port, remote->id);
 			sleep(300);
 
 			if(remote->status == YAAMP_REMOTE_TERMINATE) break;
@@ -186,7 +186,7 @@ void *remote_thread(void *p)
 
 			if(remote->nonce2size_next < 2)
 			{
-				debuglog("error nonce2 too small %d", remote->nonce2size_next);
+				debuglog("error nonce2 too small %d\n", remote->nonce2size_next);
 				remote_close(remote);
 			}
 		}
@@ -206,7 +206,7 @@ void *remote_thread(void *p)
 //				json_value *json_error = json_get_array(json, "error");
 //				if(json_error && json_error->type == json_array && json_error->u.array.length > 1)
 //				{
-//					debuglog("remote submit error JOB%d %d %s ***", remote->id,
+//					debuglog("remote submit error JOB%d %d %s ***\n", remote->id,
 //						(int)json_error->u.array.values[0]->u.integer, json_error->u.array.values[1]->u.string.ptr);
 //				}
 			}
@@ -214,7 +214,7 @@ void *remote_thread(void *p)
 
 		else if(method)
 		{
-//			debuglog(" * remote method %s", method);
+//			debuglog(" * remote method %s\n", method);
 			if(!strcmp(method, "mining.set_difficulty"))
 			{
 				if(json_params->u.array.values[0]->type == json_double)
@@ -226,7 +226,7 @@ void *remote_thread(void *p)
 				else if(json_params->u.array.values[0]->type == json_string)
 					remote->difficulty_next = atof(json_params->u.array.values[0]->u.string.ptr);
 
-			//	debuglog("remote difficulty %f", remote->difficulty_next);
+			//	debuglog("remote difficulty %f\n", remote->difficulty_next);
 			}
 
 			else if(!strcmp(method, "mining.set_extranonce"))
@@ -236,7 +236,7 @@ void *remote_thread(void *p)
 
 				if(remote->nonce2size_next < 2)
 				{
-					debuglog("error nonce2 too small %d", remote->nonce2size_next);
+					debuglog("error nonce2 too small %d\n", remote->nonce2size_next);
 					remote_close(remote);
 					job_signal();
 				}
@@ -285,7 +285,7 @@ void *remote_thread(void *p)
 		json_value_free(json);
 	}
 
-	debuglog("terminate JOB%d %s:%d", remote->id, remote->host, remote->port);
+	debuglog("terminate JOB%d %s:%d\n", remote->id, remote->host, remote->port);
 	object_delete(remote);
 
 	job_signal();

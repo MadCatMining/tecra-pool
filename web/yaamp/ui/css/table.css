@@ -4,7 +4,6 @@ table.dataGrid
 	border-collapse: collapse;
 	width: 100%;
 	color: #555;
-
 }
 
 table.dataGrid a, table.dataGrid a:visited
@@ -52,9 +51,6 @@ table.dataGrid2
 	border-collapse: collapse;
 	width: 100%;
 	color: #555;
-
-
-
 }
 
 /*table.dataGrid2 a, table.dataGrid2 a:visited

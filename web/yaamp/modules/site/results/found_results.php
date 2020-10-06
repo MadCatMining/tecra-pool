@@ -2,11 +2,9 @@
 
 function WriteBoxHeader($title)
 {
-
 	echo "<div class='main-left-box'>";
-	echo "<div class='main-left-title' id='main-left-title'>$title <span style='float:right'>(click to expand)</span></div>";
-	echo "<br>";
-	echo "<div class='main-left-inner' id='main-left-inner' style='display:none'>";
+	echo "<div class='main-left-title'>$title</div>";
+	echo "<div class='main-left-inner'>";
 }
 
 $showrental = (bool) YAAMP_RENTAL;
@@ -42,9 +40,9 @@ b.row a { font-size: 10pt; }
 td.right { text-align: right; }
 </style>
 
-<table class="dataGrid2" >
-<thead class="table-title">
-<tr >
+<table class="dataGrid2">
+<thead>
+<tr>
 <td></td>
 <th>Name</th>
 <th align="right">Amount</th>
@@ -54,7 +52,6 @@ td.right { text-align: right; }
 <th align="right">Status</th>
 </tr>
 </thead>
-
 EOT;
 
 foreach($db_blocks as $db_block)
@@ -123,33 +120,8 @@ foreach($db_blocks as $db_block)
 
 echo "</table>";
 
-
-
-
-
-
 echo "<br></div></div><br>";
 
 
-echo <<<EOT
 
-<script>
-var coll = document.getElementById("main-left-title");
-
-  coll.addEventListener("click", function() {
-    this.classList.toggle("active");
-/*    var content = this.nextElementSibling;*/
-	  var content = document.getElementById("main-left-inner");
-    if (content.style.display === "inline") {
-		this.innerHTML = "Last $count Blocks ($algo) <span style='float:right'>(click to expland)</span>";
-      content.style.display = "none";
-    } else {
-	  content.style.display = "inline";
-	  this.innerHTML = "Last $count Blocks ($algo)";
-    }
-  });
-
-</script>
-
-EOT;
 
